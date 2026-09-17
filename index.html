@@ -1,4 +1,4 @@
-<title>Agentic Threat Register</title>
+<title>Agentic Threat Taxonomy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
@@ -17,6 +17,7 @@
 
     /* filter families — blue / violet / rust, one hue per attribute row */
     --f-time:#1F5C8B; --f-origin:#6B3FA0; --f-inj:#A33A2E;
+    --p-con:#A33A2E; --p-int:#8A6A12; --p-avl:#2E7D46; --k-pos:#9A5B18;
 
     --serif:"Source Serif 4",Georgia,serif;
     --sans:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -32,6 +33,7 @@
       --s-rp:#7FA6F5; --s-km:#3ED0C4; --s-ta:#AE8DF5; --s-xa:#5CCB7C;
       --s-hi:#A5C455; --s-ia:#F080C4; --s-sc:#DBB13F; --s-rt:#8FA6BC;
       --f-time:#6FB4E8; --f-origin:#B99BF0; --f-inj:#F0836F;
+      --p-con:#F0836F; --p-int:#DBB13F; --p-avl:#5CCB7C; --k-pos:#E8A05A;
     }
   }
   :root[data-theme="dark"]{
@@ -43,6 +45,7 @@
     --s-rp:#7FA6F5; --s-km:#3ED0C4; --s-ta:#AE8DF5; --s-xa:#5CCB7C;
     --s-hi:#A5C455; --s-ia:#F080C4; --s-sc:#DBB13F; --s-rt:#8FA6BC;
     --f-time:#6FB4E8; --f-origin:#B99BF0; --f-inj:#F0836F;
+      --p-con:#F0836F; --p-int:#DBB13F; --p-avl:#5CCB7C; --k-pos:#E8A05A;
   }
 
   *{box-sizing:border-box}
@@ -56,7 +59,9 @@
         max-width:1196px;margin:0 auto;padding:0 28px 96px}
 
   /* ---- rail toggle ---- */
-  .navtoggle{position:sticky;top:40px;z-index:5;display:flex;align-items:center;
+  /* deliberately not sticky: .rail already is, so the button rides along with it. A nested
+     sticky shifted it down out of flow and dropped it onto the first nav link. */
+  .navtoggle{display:flex;align-items:center;
     justify-content:center;width:28px;height:28px;margin:0 0 15px;padding:0;cursor:pointer;
     background:var(--surface);border:1px solid var(--rule-firm);border-radius:2px;
     color:var(--muted)}
@@ -157,13 +162,28 @@
   .num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono)}
   .src{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
   td.lnk{font-size:11.5px;line-height:1.3;color:var(--muted)}
-  td.lnk span{display:grid;grid-template-columns:29px 1fr;gap:0 6px;margin-bottom:3px}
+  /* these labels wrap to two lines, so entries need to separate by more than the line gap
+     or a wrapped line reads as a new entry */
+  td.lnk span{display:grid;grid-template-columns:29px 1fr;gap:0 6px;margin-bottom:7px}
   td.lnk span:last-child{margin-bottom:0}
   td.lnk b{font-family:var(--mono);font-size:10.5px;font-weight:600}
   td.lnk .w b{color:var(--w)}
   td.lnk .i b{color:var(--i)}
   .id{font-family:var(--mono);font-size:12.5px;font-weight:600;white-space:nowrap}
   .id.t{color:var(--t)} .id.w{color:var(--w)} .id.i{color:var(--i)}
+  /* where .id is an inline badge before a word rather than filling its own cell, a plain
+     word space is too tight against the mono glyph */
+  span.id{margin-right:5px}
+  .prop{font-weight:600}
+  .prop.con{color:var(--p-con)} .prop.int{color:var(--p-int)} .prop.avl{color:var(--p-avl)}
+  /* distribution: each cut carries the colour of the filter family it counts */
+  td.dist{color:var(--muted)}
+  td.dist b{font-weight:600;color:var(--dc)}
+  td.dist .alt{color:var(--w)}
+  .d-time{--dc:var(--f-time)} .d-origin{--dc:var(--f-origin)}
+  .d-inj{--dc:var(--f-inj)}
+  /* must out-specify td.dist b, which would otherwise apply an unset --dc here */
+  td.dist.d-surf b{color:var(--s,var(--t))}
   td .nm{font-weight:600}
   td .ds{display:block;color:var(--muted);font-size:12.5px;margin-top:2px;
          max-width:52ch}
@@ -186,7 +206,8 @@
   .ovw .oc{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--s);letter-spacing:.05em}
   .ovw .on{font-size:12.5px;font-weight:600}
   .ovw .ok{margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
-           text-transform:uppercase;color:var(--faint)}
+           text-transform:uppercase;color:var(--t)}
+  .ovw .ok.pos{color:var(--k-pos)}
   .ovw ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-width:none}
   .ovw li{margin:0;font-size:12.5px;line-height:1.42;display:grid;
           grid-template-columns:40px 1fr;gap:0 8px}
@@ -213,6 +234,9 @@
       white-space:nowrap}
   .fb i{font-style:normal;font-size:9px;opacity:.62}
   .fg.f-time{--fc:var(--f-time)} .fg.f-origin{--fc:var(--f-origin)} .fg.f-inj{--fc:var(--f-inj)}
+  /* via runs the other way — it delivers injection rather than receiving it — so it takes
+     the green of its own chip instead of the family's rust */
+  .fb[data-val="via"]{--fc:var(--w)}
   /* hover thickens the outline; only the pressed state fills, so the two never read alike */
   .fb:hover:not([aria-pressed="true"]){box-shadow:inset 0 0 0 1px var(--fc)}
   .fb[aria-pressed="true"]{background:var(--fc);color:var(--surface);
@@ -299,16 +323,19 @@
   .chip.build{border-color:var(--t);color:var(--t);background:var(--t-soft)}
   .chip.run{border-color:var(--t);color:var(--t)}
   /* origin — graphite family */
-  .chip.adv{border-color:var(--muted);color:var(--ink);background:var(--raised)}
-  .chip.auto{border-color:var(--muted);color:var(--muted);border-style:dashed}
-  .chip.both{border-color:var(--muted);color:var(--muted)}
+  /* origin carries the filter's purple, so legend and filter agree */
+  .chip.adv{border-color:var(--f-origin);color:var(--f-origin);background:var(--raised)}
+  .chip.auto{border-color:var(--f-origin);color:var(--f-origin);border-style:dashed}
+  .chip.both{border-color:var(--f-origin);color:var(--f-origin)}
   .chip.inj{border-color:var(--i);color:var(--i);background:var(--i-soft)}
   .chip.injc{border-color:var(--i);color:var(--i);border-style:dashed}
   .chip.via{border-color:var(--w);color:var(--w)}
+  /* position is a kind, like plane — it should not read as an unstyled default */
+  .chip.pos{border-color:var(--k-pos);color:var(--k-pos)}
   .chip.plane{border-color:var(--t);color:var(--t);background:var(--t-soft)}
 
   /* ---- whole-graph view ---- */
-  #gsvg{min-width:1010px}
+  #gsvg{min-width:1048px}
   #gsvg .gh{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.11em;
             text-transform:uppercase;fill:currentColor}
   #gsvg .gsub{font-family:var(--sans);font-size:10.5px;fill:var(--faint)}
@@ -318,6 +345,8 @@
   #gsvg .e-it{stroke:var(--f-origin);stroke-dasharray:3.5 3}
   #gsvg .e-tt{stroke:var(--t)}
   #gsvg .e-tt.cnd{stroke-dasharray:3.5 3}
+  /* inbound via edges deliver injection rather than escalate from it */
+  #gsvg .e-tt.via{stroke:var(--w)}
   #gsvg .nb{fill:var(--surface);stroke:var(--rule-firm);stroke-width:1}
   #gsvg .nw{stroke:var(--w)} #gsvg .ni{stroke:var(--i)}
   #gsvg .nt{stroke:var(--s,var(--t))}
@@ -342,7 +371,8 @@
   .fg.g-it{--fc:var(--f-origin)} .fg.g-tt{--fc:var(--t)}
   .gbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin:18px 0 0;padding:11px 13px;
         border:1px solid var(--rule);border-radius:2px;background:var(--stripe)}
-  .gbar .fg{border-left:3px solid var(--fc);padding-left:9px;gap:7px}
+  /* must be flex for the gap to apply — as a block the label butted against the button */
+  .gbar .fg{display:flex;align-items:center;gap:8px;border-left:3px solid var(--fc);padding-left:9px}
   .gbar .fl{flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;
             text-transform:uppercase;font-weight:600;color:var(--fc)}
   .gbar .gc{font-family:var(--mono);font-size:9px;color:var(--faint)}
@@ -374,14 +404,20 @@
   .legend .chip{margin:2px 0 0}
   @media (max-width:640px){.legend > div{grid-template-columns:1fr;gap:6px 0}}
 
-  /* ---- chain diagram ---- */
-  .chain{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0 4px;
-         font-family:var(--mono);font-size:12.5px}
-  .node{padding:7px 13px;border:1px solid;border-radius:2px;font-weight:600}
-  .node.w{color:var(--w);border-color:var(--w);background:var(--w-soft)}
-  .node.t{color:var(--t);border-color:var(--t);background:var(--t-soft)}
-  .node.i{color:var(--i);border-color:var(--i);background:var(--i-soft)}
-  .arrow{color:var(--faint);font-size:11px;letter-spacing:.02em}
+  /* ---- three-layer schematic ---- */
+  /* edge colours match the whole-graph view, so this doubles as its legend */
+  #schema{min-width:0;max-width:720px;margin:0 auto}
+  #schema .bx{stroke-width:1.5}
+  #schema .bw{fill:var(--w-soft);stroke:var(--w)}
+  #schema .bt{fill:var(--t-soft);stroke:var(--t)}
+  #schema .bi{fill:var(--i-soft);stroke:var(--i)}
+  #schema .sl{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.12em}
+  #schema .sd{font-family:var(--sans);font-size:13px;fill:var(--ink)}
+  #schema .sc{font-family:var(--sans);font-size:11.5px;fill:var(--muted)}
+  #schema .sr{font-family:var(--mono);font-size:11px}
+  #schema .ew{stroke:var(--w)} #schema .ei{stroke:var(--i)}
+  #schema .eb{stroke:var(--f-origin);stroke-dasharray:5 4} #schema .et{stroke:var(--t)}
+  #schema .ed{fill:none;stroke-width:1.6}
 
   figure{margin:20px 0 0}
   figure .scroll{margin:0;padding:20px 18px}
@@ -410,7 +446,7 @@
        to shrink below the min-content width of its widest descendant */
     .wrap > *{min-width:0}
     .rail{position:static;padding:26px 0 0}
-    .navtoggle{position:static;margin-bottom:12px}
+    .navtoggle{margin-bottom:12px}
     .rail nav{flex-direction:row;flex-wrap:wrap;gap:0 16px;border-left:0;padding-left:0}
     .rail .grp{display:none}
     .key{border-left:0;padding-left:0;flex-direction:row;flex-wrap:wrap;gap:14px}
@@ -463,7 +499,7 @@
 
 <header>
   <div class="kicker">OWASP · Agentic AI · Draft for review</div>
-  <h1>Agentic Threat Register</h1>
+  <h1>Agentic Threat Taxonomy</h1>
   <p class="standfirst">Forty entries from five OWASP sources, resolved into one walkable model:
     twenty threats across eight surfaces, the conditions that enable them, and the harms they
     produce — with every original ID still traceable.</p>
@@ -490,17 +526,7 @@
     cross-references, and range from stable release to incubator draft. The result cannot be
     walked against a design.</p>
 
-  <h3>Safety and security are both in scope</h3>
-  <p>The register covers <strong>adversarial threats and autonomous failures alike</strong>,
-    separated by an <code>origin</code> attribute rather than by two models. At the deployment
-    layer the two converge: the same over-permissioned architecture produces both, and the same
-    controls govern both. A model that cannot describe the Replit production-database deletion —
-    no adversary, catastrophic outcome — is incomplete for agentic systems.</p>
-  <p>Model-level safety — refusal training, alignment of the base model — is out of scope; that
-    is the model provider's work. The training phase in the reference architecture is not an
-    exception: what it covers is the <em>supply</em> of training inputs and the <em>integrity</em>
-    of the resulting artifact, not whether the model is well aligned.</p>
-</section>
+      </section>
 
 <!-- ============ SOURCES ============ -->
 <section id="sources">
@@ -517,12 +543,7 @@
       </tbody>
     </table>
   </div>
-  <p style="margin-top:13px">The State report is included because it supplies root causes and
-    safety-origin threats that all four Top 10 lists omit. It carries no numbered entries, so its
-    contributions are cited by chapter. <strong>Two sources are drafts:</strong> 8 of 20 threats
-    and 7 of 12 weaknesses derive wholly or partly from MCP v0.1 or AST v1.0, and the entire
-    supply-chain surface rests on them.</p>
-</section>
+  </section>
 
 <!-- ============ STRUCTURE ============ -->
 <section id="structure">
@@ -530,12 +551,57 @@
   <p class="lede">Every source entry is assigned to exactly one layer by a single test. Where an
     entry conflates layers, it is split and mapped to each.</p>
 
-  <div class="chain">
-    <span class="node w">WEAKNESS</span><span class="arrow">— enables →</span>
-    <span class="node t">THREAT</span><span class="arrow">— produces →</span>
-    <span class="node i">IMPACT</span><span class="arrow">— chains back to T</span>
-    <span class="arrow">·&nbsp;&nbsp;and&nbsp;&nbsp;T — enables → T</span>
-  </div>
+  <figure>
+    <div class="scroll">
+      <svg id="schema" viewBox="0 0 720 258" role="img" aria-label="The three layers and the four relations between them. A weakness is a standing condition and enables a threat; a threat is an event and produces an impact; an impact is an outcome and chains back to become the precondition for a further threat; and a threat can enable another threat directly, without an impact in between. Twelve weaknesses, twenty threats, six impacts.">
+        <defs>
+          <marker id="sw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--w)"/>
+          </marker>
+          <marker id="si" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--i)"/>
+          </marker>
+          <marker id="sb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--f-origin)"/>
+          </marker>
+          <marker id="st" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--t)"/>
+          </marker>
+        </defs>
+
+        <!-- edges first, so the boxes sit on top of their endpoints -->
+        <path class="ed et" d="M322,59 C322,26 398,26 398,59" marker-end="url(#st)"/>
+        <path class="ed ew" d="M204,105 L264,105" marker-end="url(#sw)"/>
+        <path class="ed ei" d="M450,105 L510,105" marker-end="url(#si)"/>
+        <path class="ed eb" d="M606,151 C606,212 360,212 360,152" marker-end="url(#sb)"/>
+
+        <rect class="bx bw" x="26" y="62" width="176" height="86" rx="3"/>
+        <text class="sl" x="114" y="94" text-anchor="middle" fill="var(--w)">WEAKNESS</text>
+        <text class="sd" x="114" y="116" text-anchor="middle">a condition</text>
+        <text class="sc" x="114" y="134" text-anchor="middle">12 entries</text>
+
+        <rect class="bx bt" x="272" y="62" width="176" height="86" rx="3"/>
+        <text class="sl" x="360" y="94" text-anchor="middle" fill="var(--t)">THREAT</text>
+        <text class="sd" x="360" y="116" text-anchor="middle">an event</text>
+        <text class="sc" x="360" y="134" text-anchor="middle">20 entries</text>
+
+        <rect class="bx bi" x="518" y="62" width="176" height="86" rx="3"/>
+        <text class="sl" x="606" y="94" text-anchor="middle" fill="var(--i)">IMPACT</text>
+        <text class="sd" x="606" y="116" text-anchor="middle">an outcome</text>
+        <text class="sc" x="606" y="134" text-anchor="middle">6 entries</text>
+
+        <text class="sr" x="234" y="95" text-anchor="middle" fill="var(--w)">enables</text>
+        <text class="sr" x="480" y="95" text-anchor="middle" fill="var(--i)">produces</text>
+        <text class="sr" x="360" y="22" text-anchor="middle" fill="var(--t)">enables</text>
+        <text class="sr" x="483" y="232" text-anchor="middle" fill="var(--f-origin)">chains to — becomes the precondition for a further threat</text>
+      </svg>
+    </div>
+    <figcaption><strong>Four relations, four colours</strong> — the same four the whole-graph view
+      uses. The two forward arrows compose into <code>W → I</code>, which is why that relation is
+      derived rather than stored. The two that run backwards or sideways are what make multi-step
+      attacks expressible: an impact becoming a precondition, and a threat enabling another
+      directly.</figcaption>
+  </figure>
   <p style="margin-top:14px">Four relations: <code>W → T</code>, <code>T → I</code>,
     <code>I → T</code>, <code>T → T</code>. There is no <code>W → I</code> — it is derived by
     composing the first two, never stored.</p>
@@ -572,17 +638,7 @@ I5     cascading failures           downstream agents compound the error</pre>
     <em>terminates</em> at <code>I5</code>, so it does not itself show <code>I5</code> chaining
     onward; the enumeration supplies that separately, <code>I5 → RP.1</code> and
     <code>I5 → RT.1</code>. Without the relation, this is six unrelated register entries.</p>
-  <p>The <strong>lethal trifecta</strong> appears here as the middle move,
-    <code>I1 → TA.1</code>: private data in context, an untrusted instruction already in play, and
-    an outbound tool to carry it. Written as a standalone path it reads
-    <code>RP.1 → I1 → TA.1 → I1</code> and produces <code>I1</code> twice — once when data is
-    retrieved into context, once when it leaves the boundary. Those are different events with
-    different reporting consequences, and the impact layer does not distinguish them.</p>
-  <p>Both hops here — <code>I4 → IA.2</code> and <code>I1 → TA.1</code> — are among the
-    <strong>13 <code>I → T</code> edges</strong>, which are enumerated with the impacts that carry
-    them in <a href="#impacts">the impact register</a>.</p>
-
-</section>
+    </section>
 
 <!-- ============ SURFACES ============ -->
 <section id="surfaces">
@@ -594,14 +650,14 @@ I5     cascading failures           downstream agents compound the error</pre>
     <table>
       <thead><tr><th>Code</th><th>Surface</th><th>What it covers</th><th>Kind</th><th class="num">Threats</th></tr></thead>
       <tbody>
-        <tr class="s-rp"><td class="id s">RP</td><td>Reasoning &amp; Planning</td><td>How the agent interprets instructions and forms goals</td><td><span class="chip">position</span></td><td class="num">4</td></tr>
-        <tr class="s-km"><td class="id s">KM</td><td>Knowledge &amp; Memory</td><td>What the agent retrieves and remembers</td><td><span class="chip">position</span></td><td class="num">2</td></tr>
-        <tr class="s-ta"><td class="id s">TA</td><td>Tools &amp; Actions</td><td>What the agent can do</td><td><span class="chip">position</span></td><td class="num">2</td></tr>
+        <tr class="s-rp"><td class="id s">RP</td><td>Reasoning &amp; Planning</td><td>How the agent interprets instructions and forms goals</td><td><span class="chip pos">position</span></td><td class="num">4</td></tr>
+        <tr class="s-km"><td class="id s">KM</td><td>Knowledge &amp; Memory</td><td>What the agent retrieves and remembers</td><td><span class="chip pos">position</span></td><td class="num">2</td></tr>
+        <tr class="s-ta"><td class="id s">TA</td><td>Tools &amp; Actions</td><td>What the agent can do</td><td><span class="chip pos">position</span></td><td class="num">2</td></tr>
         <tr class="s-ia"><td class="id s">IA</td><td>Identity &amp; Authority</td><td>Who the agent acts as</td><td><span class="chip plane">plane</span></td><td class="num">2</td></tr>
-        <tr class="s-xa"><td class="id s">XA</td><td>Inter-Agent</td><td>What other agents assert</td><td><span class="chip">position</span></td><td class="num">2</td></tr>
+        <tr class="s-xa"><td class="id s">XA</td><td>Inter-Agent</td><td>What other agents assert</td><td><span class="chip pos">position</span></td><td class="num">2</td></tr>
         <tr class="s-sc"><td class="id s">SC</td><td>Extensions &amp; Supply Chain</td><td>What the agent is built from</td><td><span class="chip plane">plane</span></td><td class="num">4</td></tr>
         <tr class="s-rt"><td class="id s">RT</td><td>Runtime &amp; Infrastructure</td><td>Where and on what the agent executes</td><td><span class="chip plane">plane</span></td><td class="num">3</td></tr>
-        <tr class="s-hi"><td class="id s">HI</td><td>Human Interface</td><td>What the human believes</td><td><span class="chip">position</span></td><td class="num">1</td></tr>
+        <tr class="s-hi"><td class="id s">HI</td><td>Human Interface</td><td>What the human believes</td><td><span class="chip pos">position</span></td><td class="num">1</td></tr>
       </tbody>
     </table>
   </div>
@@ -609,7 +665,7 @@ I5     cascading failures           downstream agents compound the error</pre>
   <h3>Kind — how to read the column above</h3>
   <div class="legend">
     <div>
-      <span class="chip">position</span>
+      <span class="chip pos">position</span>
       <p>Occupies <strong>one place in the data flow</strong>, and a threat there compromises that
         component. Scoped out if the system does not have it — an agent that delegates to no other
         agent has no <code>XA</code>.</p>
@@ -622,13 +678,7 @@ I5     cascading failures           downstream agents compound the error</pre>
         before you assess a single position.</p>
     </div>
   </div>
-  <p style="margin-top:15px"><code>SC</code> is the one surface with <strong>no position in the
-    runtime flow at all</strong> — it appears only in the upper band of the diagram, and its four
-    threats are assessed against registries, pipelines and CI rather than against the running
-    system. Two other build-time threats sit on surfaces that do have runtime positions:
-    <code>KM.2</code> and <code>RT.3</code>.</p>
-
-  <figure>
+    <figure>
     <div class="scroll">
       <svg viewBox="0 0 880 838" role="img" aria-label="Two-band agentic architecture. The upper build and supply band has a training phase — datasets and base weights carrying supply-chain threats, feeding a training step that carries data and model poisoning — and an application phase of four supplied components, each feeding a runtime component below through a doubled supply arrow. The lower runtime band shows the agent core exchanging with the human interface above, the tool layer to its right, and sub-agents below. Attacker-controllable content crosses the trust boundary at three separate places, each drawn as an emphasised arrow: retrieved documents enter context and memory from the untrusted-content source on the left, tool responses enter the tool layer from downstream systems on the right, and peer messages enter the sub-agent box from an external-agents source on the right. From all three the content then converges on the agent core, which is the fan-in that makes prompt injection a chokepoint. Two cross-cutting planes for identity and runtime span the whole band.">
         <defs>
@@ -825,7 +875,7 @@ I5     cascading failures           downstream agents compound the error</pre>
 
   <div class="ovw" id="tovw">
     <div class="s-rp">
-      <div class="oh"><span class="oc">RP</span><span class="on">Reasoning &amp; Planning</span><span class="ocount"></span><span class="ok">position</span></div>
+      <div class="oh"><span class="oc">RP</span><span class="on">Reasoning &amp; Planning</span><span class="ocount"></span><span class="ok pos">position</span></div>
       <ul>
         <li data-time="run" data-origin="adv" data-inj="entry"><b>RP.1</b> Prompt Injection</li>
         <li data-time="run" data-origin="adv" data-inj="inj"><b>RP.2</b> Agent Goal Hijack</li>
@@ -834,14 +884,14 @@ I5     cascading failures           downstream agents compound the error</pre>
       </ul>
     </div>
     <div class="s-km">
-      <div class="oh"><span class="oc">KM</span><span class="on">Knowledge &amp; Memory</span><span class="ocount"></span><span class="ok">position</span></div>
+      <div class="oh"><span class="oc">KM</span><span class="on">Knowledge &amp; Memory</span><span class="ocount"></span><span class="ok pos">position</span></div>
       <ul>
         <li data-time="run" data-origin="adv" data-inj="inj via"><b>KM.1</b> Memory and Context Poisoning</li>
         <li data-time="build" data-origin="adv" data-inj="none"><b>KM.2</b> Data and Model Poisoning</li>
       </ul>
     </div>
     <div class="s-ta">
-      <div class="oh"><span class="oc">TA</span><span class="on">Tools &amp; Actions</span><span class="ocount"></span><span class="ok">position</span></div>
+      <div class="oh"><span class="oc">TA</span><span class="on">Tools &amp; Actions</span><span class="ocount"></span><span class="ok pos">position</span></div>
       <ul>
         <li data-time="run" data-origin="both" data-inj="inj"><b>TA.1</b> Tool Misuse and Exploitation</li>
         <li data-time="run" data-origin="adv" data-inj="via"><b>TA.2</b> Tool Poisoning</li>
@@ -855,7 +905,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       </ul>
     </div>
     <div class="s-xa">
-      <div class="oh"><span class="oc">XA</span><span class="on">Inter-Agent</span><span class="ocount"></span><span class="ok">position</span></div>
+      <div class="oh"><span class="oc">XA</span><span class="on">Inter-Agent</span><span class="ocount"></span><span class="ok pos">position</span></div>
       <ul>
         <li data-time="run" data-origin="adv" data-inj="via"><b>XA.1</b> Insecure Inter-Agent Communication</li>
         <li data-time="run" data-origin="both" data-inj="inj"><b>XA.2</b> Rogue Agents</li>
@@ -879,7 +929,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       </ul>
     </div>
     <div class="s-hi">
-      <div class="oh"><span class="oc">HI</span><span class="on">Human Interface</span><span class="ocount"></span><span class="ok">position</span></div>
+      <div class="oh"><span class="oc">HI</span><span class="on">Human Interface</span><span class="ocount"></span><span class="ok pos">position</span></div>
       <ul>
         <li data-time="run" data-origin="both" data-inj="inj"><b>HI.1</b> Human-Agent Trust Exploitation</li>
       </ul>
@@ -894,7 +944,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       <div class="ar"><span class="chip run">run</span><p>At execution, by runtime controls. Fourteen threats.</p></div>
     </div>
     <div>
-      <h4>Origin · graphite · what has to happen</h4>
+      <h4>Origin · purple · what has to happen</h4>
       <div class="ar"><span class="chip adv">adv</span><p><strong>Adversarial</strong> — requires someone acting against the system. Twelve.</p></div>
       <div class="ar"><span class="chip auto">auto</span><p><strong>Autonomous</strong> — the system goes wrong with no adversary present. Three.</p></div>
       <div class="ar"><span class="chip both">both</span><p>Arises either way; needs both control families. Five.</p></div>
@@ -904,29 +954,15 @@ I5     cascading failures           downstream agents compound the error</pre>
       <div class="ar"><span class="chip inj">inj entry</span><p>This threat <em>is</em> prompt injection — the entry point everything else converges on.</p></div>
       <div class="ar"><span class="chip inj">inj</span><p>Injection reaches it — <strong>directly, or through an impact injection itself produces</strong>. Unconditional: it holds in any deployment. Six threats.</p></div>
       <div class="ar"><span class="chip injc">inj?</span><p>The same, but only where the agent holds a capability in that domain — a property of the deployment, not of the injection. Two threats — preconditions below.</p></div>
-      <div class="ar"><span class="chip via">via</span><p>Runs the other way: this threat <em>delivers</em> injected instruction into <code>RP.1</code>. Four threats, drawn as the inbound edges at the end of this section.</p></div>
+      <div class="ar"><span class="chip via">via</span><p>Runs the other way: this threat is the channel injection arrives <em>through</em> — it <em>delivers</em> injected instruction into <code>RP.1</code> rather than resulting from it. This is what <q>indirect injection</q> names, with the vagueness removed: indirect <em>through what</em>. Four threats, drawn as the inbound edges at the end of this section.</p></div>
     </div>
   </div>
-  <p style="margin-top:16px"><strong>The chip records <em>whether</em>, the <code>T → T</code>
-    diagram records <em>how</em>.</strong> A chip says injection gets there; whether the route is a
-    single step or passes through an impact first is what the arrowheads and dotted lines at the end
-    of this section distinguish. Reading the chip as a claim of directness is the mistake it is
-    worded to prevent.</p>
-
-  <p>Eight threats carry no injection chip at all. They are not the whole
-    out-of-reach set, which is <strong>eleven</strong>: the three <code>via</code>-only threats —
-    <code>TA.2</code>, <code>XA.1</code>, <code>SC.1</code> — carry a chip and are still beyond
-    injection's reach, because <code>via</code> runs the other way. All eleven fail for structural
-    reasons rather than incidental ones; see the distribution note at the end of this section.</p>
-
-
-
-  <div class="grp-head s-rp" id="t-rp"><span class="sw"></span><span class="c">RP</span><span class="nm">Reasoning &amp; Planning</span><span class="ct">4 threats</span></div>
+      <div class="grp-head s-rp" id="t-rp"><span class="sw"></span><span class="c">RP</span><span class="nm">Reasoning &amp; Planning</span><span class="ct">4 threats</span></div>
   <div class="scroll s-rp"><table>
     <thead><tr><th>ID</th><th>Threat</th><th>Sources</th><th>Attributes</th><th>Enabled by</th><th>Produces</th></tr></thead>
     <tbody>
       <tr><td class="id s">RP.1</td><td><span class="nm">Prompt Injection</span><span class="ds">Untrusted content in any channel is interpreted as instruction</span></td><td class="src">LLM01 MCP06<br>AST05</td><td><span class="chip run">run</span><span class="chip adv">adv</span><span class="chip inj">inj entry</span></td><td class="lnk"><span class="w"><b>W1</b>Output handling</span><span class="w"><b>W9</b>No plane separation</span><span class="w"><b>W12</b>Unscoped context</span></td><td class="lnk"><span class="i"><b>I1</b>Data disclosure</span><span class="i"><b>I2</b>Context exposure</span><span class="i"><b>I3</b>Misinformation</span><span class="i"><b>I4</b>Code execution</span><span class="i"><b>I5</b>Cascading failure</span></td></tr>
-      <tr><td class="id s">RP.2</td><td><span class="nm">Agent Goal Hijack</span><span class="ds">Objective, task selection, or decision pathway redirected; the compromise persists across steps rather than altering one response</span></td><td class="src">ASI01</td><td><span class="chip run">run</span><span class="chip adv">adv</span><span class="chip inj">inj</span></td><td class="lnk"><span class="w"><b>W8</b>Excessive agency</span><span class="w"><b>W9</b>No plane separation</span></td><td class="lnk"><span class="i"><b>I3</b>Misinformation</span><span class="i"><b>I4</b>Code execution</span><span class="i"><b>I5</b>Cascading failure</span></td></tr>
+      <tr><td class="id s">RP.2</td><td><span class="nm">Agent Goal Hijack</span><span class="ds">Objective, task selection, or decision pathway redirected; the compromise persists across steps rather than altering one response</span></td><td class="src">ASI01</td><td><span class="chip run">run</span><span class="chip adv">adv</span><span class="chip inj">inj</span></td><td class="lnk"><span class="w"><b>W8</b>Excessive agency</span><span class="w"><b>W9</b>No plane separation</span></td><td class="lnk"><span class="i"><b>I1</b>Data disclosure</span><span class="i"><b>I3</b>Misinformation</span><span class="i"><b>I4</b>Code execution</span><span class="i"><b>I5</b>Cascading failure</span></td></tr>
       <tr><td class="id s">RP.3</td><td><span class="nm">Goal misgeneralisation</span><span class="ds">Agent optimises the measured proxy rather than the intended goal</span></td><td class="src">State §Safety</td><td><span class="chip run">run</span><span class="chip auto">auto</span></td><td class="lnk"><span class="w"><b>W4</b>No audit</span><span class="w"><b>W8</b>Excessive agency</span></td><td class="lnk"><span class="i"><b>I3</b>Misinformation</span><span class="i"><b>I5</b>Cascading failure</span></td></tr>
       <tr><td class="id s">RP.4</td><td><span class="nm">Behavioural drift</span><span class="ds">Behaviour diverges from the assessed system between sessions</span></td><td class="src">State §Safety</td><td><span class="chip run">run</span><span class="chip auto">auto</span></td><td class="lnk"><span class="w"><b>W4</b>No audit</span><span class="w"><b>W7</b>No governance</span></td><td class="lnk"><span class="i"><b>I3</b>Misinformation</span><span class="i"><b>I5</b>Cascading failure</span></td></tr>
     </tbody>
@@ -936,24 +972,7 @@ I5     cascading failures           downstream agents compound the error</pre>
     “distinct from LLM01 in that the impact is redirected goals, planning, and multi-step behaviour
     rather than a single altered response.” <code>RP.1</code> compromises a response;
     <code>RP.2</code> compromises the plan and survives to the next step.</p>
-  <p><strong><code>RP.2</code> and <code>RP.3</code> are the adversarial and autonomous versions of
-    one failure.</strong> Both end with the agent pursuing a goal nobody asked for — in one someone
-    put it there, in the other proxy optimisation drifted into it. The controls follow the
-    distinction: instruction/data separation against hijack, objective specification and behavioural
-    bounds against misgeneralisation.</p>
-  <p><strong>The name misleads, and is kept anyway.</strong> <code>LLM01</code>'s own definition
-    lists seven vectors — direct user input, retrieved content, tool output, image, audio or video
-    content, intermediate reasoning, persistent memory — of which <strong>six are not prompts</strong>.
-    Teams routinely sanitise the user input field and believe the surface is covered.
-    <em>Instruction injection</em> is the more accurate term and is retained as an alias.</p>
-  <p><strong>“Indirect injection” has no entry of its own.</strong> It is the relation between a
-    <code>via</code> threat and <code>RP.1</code>, and the register replaces the term with an answer
-    to <em>indirect through what</em> — <code>KM.1</code> a poisoned memory or RAG store,
-    <code>TA.2</code> a tool description, <code>XA.1</code> a spoofed agent message,
-    <code>SC.1</code> a hostile extension. Four named surfaces with four owners and four controls,
-    in place of one word.</p>
-
-  <div class="grp-head s-km" id="t-km"><span class="sw"></span><span class="c">KM</span><span class="nm">Knowledge &amp; Memory</span><span class="ct">2 threats</span></div>
+        <div class="grp-head s-km" id="t-km"><span class="sw"></span><span class="c">KM</span><span class="nm">Knowledge &amp; Memory</span><span class="ct">2 threats</span></div>
   <div class="scroll s-km"><table>
     <thead><tr><th>ID</th><th>Threat</th><th>Sources</th><th>Attributes</th><th>Enabled by</th><th>Produces</th></tr></thead>
     <tbody>
@@ -961,15 +980,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       <tr><td class="id s">KM.2</td><td><span class="nm">Data and Model Poisoning</span><span class="ds">Training data or model artifacts manipulated to embed behaviour</span></td><td class="src">LLM04</td><td><span class="chip build">build</span><span class="chip adv">adv</span></td><td class="lnk"><span class="w"><b>W6</b>Poor scanning</span><span class="w"><b>W7</b>No governance</span></td><td class="lnk"><span class="i"><b>I1</b>Data disclosure</span><span class="i"><b>I3</b>Misinformation</span></td></tr>
     </tbody>
   </table></div>
-  <p style="margin-top:15px"><strong><code>KM.1</code> is the persistence mechanism.</strong> It
-    carries both <code>inj</code> and <code>via</code>, and the cycle is real —
-    <code>RP.1 → KM.1 → RP.1</code>. An agent that can write to its own memory, or to the index it
-    later retrieves from, can be injected into poisoning its own corpus; the poisoned entry then
-    delivers instruction on every subsequent read. Every other <code>via</code> threat delivers
-    once. The ASI report asserts the same path: “memory poisoning frequently leads to goal hijacking
-    (ASI01), as corrupted context…” — here, <code>KM.1 → RP.1 → RP.2</code>.</p>
-
-  <div class="grp-head s-ta" id="t-ta"><span class="sw"></span><span class="c">TA</span><span class="nm">Tools &amp; Actions</span><span class="ct">2 threats</span></div>
+    <div class="grp-head s-ta" id="t-ta"><span class="sw"></span><span class="c">TA</span><span class="nm">Tools &amp; Actions</span><span class="ct">2 threats</span></div>
   <div class="scroll s-ta"><table>
     <thead><tr><th>ID</th><th>Threat</th><th>Sources</th><th>Attributes</th><th>Enabled by</th><th>Produces</th></tr></thead>
     <tbody>
@@ -1006,18 +1017,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       <tr><td class="id s">SC.4</td><td><span class="nm">Update Drift</span><span class="ds">Absent pinning or hash verification, components silently drift to malicious versions; a model pulled by tag rather than digest can be replaced under you</span></td><td class="src">AST07</td><td><span class="chip build">build</span><span class="chip adv">adv</span></td><td class="lnk"><span class="w"><b>W6</b>Poor scanning</span><span class="w"><b>W7</b>No governance</span></td><td class="lnk"><span class="i"><b>I1</b>Data disclosure</span><span class="i"><b>I4</b>Code execution</span></td></tr>
     </tbody>
   </table></div>
-  <p style="margin-top:15px"><strong><code>SC</code> spans both build phases.</strong>
-    <code>SC.2</code>, <code>SC.3</code> and <code>SC.4</code> apply to training inputs — datasets,
-    base weights, training and conversion pipelines — as well as to application components, and
-    <code>SC.3</code> and <code>SC.4</code> additionally apply to the model artifact itself, because
-    what crosses into the application phase is a supplied component like any other. Only
-    <code>SC.1</code> is application-only: a malicious extension is a runtime capability, and
-    training inputs do not carry one.</p>
-  <p>This is what the spanning sources already say. <code>LLM03</code> covers “training data,
-    models, adapters, conversion pipelines” and “third-party pre-trained models, datasets, and
-    model artifacts”; <code>ASI04</code> names “models and weights, datasets.”</p>
-
-  <div class="grp-head s-rt" id="t-rt"><span class="sw"></span><span class="c">RT</span><span class="nm">Runtime &amp; Infrastructure</span><span class="ct">3 threats · plane</span></div>
+      <div class="grp-head s-rt" id="t-rt"><span class="sw"></span><span class="c">RT</span><span class="nm">Runtime &amp; Infrastructure</span><span class="ct">3 threats · plane</span></div>
   <div class="scroll s-rt"><table>
     <thead><tr><th>ID</th><th>Threat</th><th>Sources</th><th>Attributes</th><th>Enabled by</th><th>Produces</th></tr></thead>
     <tbody>
@@ -1026,11 +1026,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       <tr><td class="id s">RT.3</td><td><span class="nm">Shadow deployment</span><span class="ds">Unapproved agent or server instances outside governance</span></td><td class="src">MCP09</td><td><span class="chip build">build</span><span class="chip auto">auto</span></td><td class="lnk"><span class="w"><b>W4</b>No audit</span><span class="w"><b>W7</b>No governance</span></td><td class="lnk"><span class="i"><b>I1</b>Data disclosure</span><span class="i"><b>I4</b>Code execution</span></td></tr>
     </tbody>
   </table></div>
-  <p style="margin-top:15px"><code>RT.1</code> is tagged <code>both</code>, not
-    <code>adversarial</code>: a runaway autonomous loop inflicting cost with no adversary present is
-    a documented incident class.</p>
-
-  <div class="grp-head s-hi" id="t-hi"><span class="sw"></span><span class="c">HI</span><span class="nm">Human Interface</span><span class="ct">1 threat</span></div>
+    <div class="grp-head s-hi" id="t-hi"><span class="sw"></span><span class="c">HI</span><span class="nm">Human Interface</span><span class="ct">1 threat</span></div>
   <div class="scroll s-hi"><table>
     <thead><tr><th>ID</th><th>Threat</th><th>Sources</th><th>Attributes</th><th>Enabled by</th><th>Produces</th></tr></thead>
     <tbody>
@@ -1042,22 +1038,13 @@ I5     cascading failures           downstream agents compound the error</pre>
   <div class="scroll"><table>
     <thead><tr><th>Cut</th><th>Breakdown</th></tr></thead>
     <tbody>
-      <tr><td>By time</td><td>6 build · 14 run</td></tr>
-      <tr><td>By origin</td><td>12 adversarial · 3 autonomous · 5 both</td></tr>
-      <tr><td>By surface</td><td>RP 4 · SC 4 · RT 3 · KM 2 · TA 2 · IA 2 · XA 2 · HI 1</td></tr>
-      <tr><td>By injection reach</td><td>1 entry · 6 unconditional · 2 conditional · 11 out of reach — and separately, 4 <em>deliver</em> injection</td></tr>
+      <tr><td>By time</td><td class="dist d-time"><b>6</b> build · <b>14</b> run</td></tr>
+      <tr><td>By origin</td><td class="dist d-origin"><b>12</b> adversarial · <b>3</b> autonomous · <b>5</b> both</td></tr>
+      <tr><td>By surface</td><td class="dist d-surf"><span class="s-rp"><b>RP 4</b></span> · <span class="s-sc"><b>SC 4</b></span> · <span class="s-rt"><b>RT 3</b></span> · <span class="s-km"><b>KM 2</b></span> · <span class="s-ta"><b>TA 2</b></span> · <span class="s-ia"><b>IA 2</b></span> · <span class="s-xa"><b>XA 2</b></span> · <span class="s-hi"><b>HI 1</b></span></td></tr>
+      <tr><td>By injection reach</td><td class="dist d-inj"><b>1</b> entry · <b>6</b> unconditional · <b>2</b> conditional · <b>11</b> out of reach — and separately, <span class="alt"><b class="alt">4</b> <em>deliver</em> injection</span></td></tr>
     </tbody>
   </table></div>
-  <p style="margin-top:15px"><strong>What injection reach shows.</strong> Nine of the twenty threats
-    are injection outcomes; eleven are not, and the eleven fail for structural reasons. Six are
-    build-time — <code>KM.2</code>, all four of <code>SC</code>, and <code>RT.3</code> — and
-    <strong>injection reaches no build-time threat at all</strong>. The remaining five are runtime
-    but outside the instruction channel: <code>RP.3</code> and <code>RP.4</code> need no adversary,
-    <code>XA.1</code> is network-layer, <code>RT.2</code> is query-volume, and <code>TA.2</code>
-    runs the other way. Injection owns the runtime <em>meaning</em> layer almost completely and
-    touches nothing else.</p>
-
-  <h3 id="t-cond">The two <code>inj?</code> preconditions</h3>
+    <h3 id="t-cond">The two <code>inj?</code> preconditions</h3>
   <div class="scroll"><table>
     <thead><tr><th>Threat</th><th>Injection reaches it only where…</th></tr></thead>
     <tbody>
@@ -1169,14 +1156,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       the same node, so <code>RP.1 → KM.1 → RP.1</code> is a cycle.</figcaption>
   </figure>
 
-  <p style="margin-top:15px"><strong>Nothing in this relation is curated.</strong> The four inbound
-    edges derive from <code>via</code>, which is <em>defined</em> as delivering injected instruction
-    into <code>RP.1</code>, so the target is fixed by the definition. The eight outbound edges derive
-    from <code>inj</code> and <code>inj?</code>. The composed paths derive from <code>T → I</code>
-    and <code>I → T</code>. There is no hand-maintained list anywhere in it, and so nothing that can
-    go stale without another view catching it.</p>
-
-  <p><strong>Direct and composed are not competing classifications.</strong> Where both exist they
+    <p><strong>Direct and composed are not competing classifications.</strong> Where both exist they
     are two different attacks on the same pair, and the difference is <em>where you can
     intervene</em>. <code>RP.1 → I4 → XA.2</code> is an injected instruction that runs code which
     registers an unsanctioned agent — sandbox the interpreter and that route closes.
@@ -1198,48 +1178,7 @@ I5     cascading failures           downstream agents compound the error</pre>
     </tbody>
   </table></div>
 
-  <p style="margin-top:15px"><strong><code>RP.2</code> is the only threat injection reaches by
-    exactly one route.</strong> Every other threat on the right has at least two. That makes goal
-    hijack the single place where containing an impact achieves nothing at all and the control has
-    to sit at the instruction channel — and it is a derived fact now, not a curated judgement. It
-    replaces the old three-edges-versus-five-reach split, which asked which escalations to admit and
-    answered inconsistently: <code>TA.1</code> and <code>XA.2</code> carry identical attributes and
-    were classified oppositely.</p>
-
-  <p><strong><code>RP.1</code> composes to all thirteen <code>I → T</code> edges</strong>, because it
-    produces five of the six impacts and the sixth, <code>I6</code>, is a pure sink. Two of the
-    thirteen point back at <code>RP.1</code> itself: <code>I2 → RP.1</code> is why prompt extraction
-    matters — once the guardrail wording is known, injection can be written to evade the guardrails
-    it just read — and <code>I5 → RP.1</code> is how injection propagates across a fleet, a corrupted
-    upstream output read downstream as instruction.</p>
-
-  <p style="margin-top:15px"><strong><code>KM.1</code> is the only threat on both sides</strong>,
-    which is what makes the cycle real rather than rhetorical. An agent that can write to its own
-    memory, or to the index it later retrieves from, can be injected into poisoning its own corpus;
-    the poisoned entry then delivers instruction on every subsequent read. Every other inbound
-    threat delivers once.</p>
-
-  <p><strong>The direct routes are reasoned, not sourced.</strong> None of the five OWASP documents
-    models threat-to-threat escalation, so every direct edge rests on analysis of the mechanism — an
-    injected instruction that says <em>remember that X</em>, or delegates beyond scope, or calls a
-    tool without bound. The composed paths inherit the same caveat one layer down, since the
-    <code>I → T</code> edges they compose are themselves reasoned rather than measured. What changed
-    is that the judgement is now visible per route instead of hidden inside a decision about which
-    escalations to admit.</p>
-
-  <p>This is also the answer to the obvious challenge — <em>why is <code>RP.1</code> an entry at
-    all, when eight threats can be reached from it?</em> Because five of the eight carry a
-    <span class="chip both">both</span> origin and occur with no adversary present, so injection is
-    one route among several rather than the route; and because <code>RP.1</code> reaches five of the
-    six impacts by paths that pass through none of them. <code>RT.3</code> is <em>not</em> among the
-    eight, and used to be. It carried a conditional injection marker alongside an
-    <span class="chip auto">auto</span> origin, and those cannot both hold — injection is adversarial
-    by definition, so an entry cannot be adversary-free and injection-reachable at once. Where an
-    injected instruction <em>does</em> make an agent start an unsanctioned container, the event is
-    <code>TA.1</code> tool misuse and the deployment is its result: the path is
-    <code>RP.1 → TA.1</code>, never <code>RP.1 → RT.3</code>. Injection therefore reaches no
-    build-time threat at all, without exception.</p>
-</section>
+          </section>
 
 <!-- ============ WEAKNESSES ============ -->
 <section id="weaknesses">
@@ -1248,21 +1187,7 @@ I5     cascading failures           downstream agents compound the error</pre>
     negation of a design principle. <strong>Click any row</strong> to see which threats it enables —
     51 <code>W → T</code> edges in all — and which impacts those threats reach.</p>
 
-  <p><strong>There is no direct <code>W → I</code> relation, and deliberately so.</strong> A weakness
-    produces no harm on its own; it enables a threat, and the threat produces the harm. But the two
-    edges compose, and the composition answers the question a control owner actually asks: <em>if I
-    fix this, which harms am I less exposed to?</em> That is the second line inside each expanded
-    row. Two weaknesses — <code>W3</code> Insufficient Authentication &amp; Authorisation and
-    <code>W4</code> Lack of Audit and Telemetry — reach <strong>all six impacts</strong>, and they
-    are the only two that do. Reach is not the same as control leverage, and the register separates
-    them: <code>W7</code> No Governance ties <code>W4</code> at the top of the leverage ranking with
-    nine threats each, yet reaches only four impacts, because six of its nine sit in the build band
-    and terminate in the same few outcomes. <code>W3</code> enables seven and reaches all six. Fix
-    by leverage and you touch the most threats; fix by reach and you close the most kinds of harm.
-    At the other end, only <code>W2</code>, <code>W3</code> and <code>W4</code> reach
-    <code>I6</code> at all, because availability and cost loss comes solely from the <code>RT</code>
-    surface.</p>
-  <div class="tbar"><button class="xall" type="button">Expand all</button></div>
+    <div class="tbar"><button class="xall" type="button">Expand all</button></div>
   <div class="scroll"><table>
       <thead class="pairhd"><tr><th>ID</th><th>Weakness</th><th>Source</th><th>Principle violated</th><th>Enables</th></tr></thead>
     <tbody>
@@ -1280,8 +1205,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       <tr class="rw"><td class="id w">W12</td><td>Insufficient context scoping</td><td class="src">MCP10 <em>split</em></td><td><span class="nm">Least Sharing</span><span class="ds">NIST SP 800-160v1r1 T4</span></td><td class="cnt">2</td></tr><tr class="exp e-w" hidden><td colspan="5"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-ia"><b>IA.1</b>Identity and Privilege Abuse</span></div><div class="reach"><span class="rlbl">which between them reach 5 of the 6 impacts</span><em><b>I1</b>Data disclosure</em><em><b>I2</b>Context exposure</em><em><b>I3</b>Misinformation</em><em><b>I4</b>Code execution</em><em><b>I5</b>Cascading failure</em></div></td></tr>
     </tbody>
   </table></div>
-  <p style="margin-top:13px">Every principle is drawn from a published catalogue rather than composed here — <strong>NIST SP 800-160 Vol. 1 Rev. 1 (Nov 2022), Table 4 “Principles for Trustworthy Secure Design”</strong> supplies eight of the twelve. Each weakness is stated as a negation, so the principle is simply its positive form.</p>
-</section>
+  </section>
 
 <!-- ============ IMPACTS ============ -->
 <section id="impacts">
@@ -1289,18 +1213,18 @@ I5     cascading failures           downstream agents compound the error</pre>
   <p class="lede">Outcomes — what you would report to a regulator. The property column is the
     counterpart to the weakness layer's principle column: a principle broken at one end, a property
     lost at the other, with the threat as the event between them. <strong>Expand any count</strong>
-    to see which threats produce that impact — 48 <code>T → I</code> edges in all — and, below that,
+    to see which threats produce that impact — 49 <code>T → I</code> edges in all — and, below that,
     which threats the impact chains onward into.</p>
   <div class="tbar"><button class="xall" type="button">Expand all</button></div>
   <div class="scroll"><table>
-      <thead class="pairhd"><tr><th>ID</th><th>Impact</th><th>Sources</th><th>Property lost</th><th>Reached by</th></tr></thead>
+      <thead class="pairhd"><tr><th>ID</th><th>Impact</th><th>Sources</th><th>Property lost</th><th>Reached by</th><th>Chains into</th></tr></thead>
     <tbody>
-      <tr class="rw"><td class="id i">I1</td><td>Sensitive data disclosure</td><td class="src">LLM02 · MCP01</td><td>Confidentiality</td><td class="cnt">16</td></tr><tr class="exp e-i" hidden><td colspan="5"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-km"><b>KM.1</b>Memory and Context Poisoning</span><span class="s-km"><b>KM.2</b>Data and Model Poisoning</span><span class="s-ta"><b>TA.1</b>Tool Misuse and Exploitation</span><span class="s-ta"><b>TA.2</b>Tool Poisoning</span><span class="s-ia"><b>IA.1</b>Identity and Privilege Abuse</span><span class="s-ia"><b>IA.2</b>Privilege Escalation via Scope Creep</span><span class="s-xa"><b>XA.1</b>Insecure Inter-Agent Communication</span><span class="s-xa"><b>XA.2</b>Rogue Agents</span><span class="s-sc"><b>SC.1</b>Malicious extension</span><span class="s-sc"><b>SC.2</b>Dependency tampering</span><span class="s-sc"><b>SC.3</b>Metadata &amp; provenance forgery</span><span class="s-sc"><b>SC.4</b>Update Drift</span><span class="s-rt"><b>RT.2</b>Model extraction</span><span class="s-rt"><b>RT.3</b>Shadow deployment</span><span class="s-hi"><b>HI.1</b>Human-Agent Trust Exploitation</span></div><div class="reach"><span class="rlbl">and chains into 2 threats</span><em class="t s-ta"><b>TA.1</b>Tool Misuse</em><em class="t s-ia"><b>IA.1</b>Identity and Privilege Abuse</em></div></td></tr>
-      <tr class="rw"><td class="id i">I2</td><td>Hidden Context Exposure</td><td class="src">LLM07</td><td>Confidentiality</td><td class="cnt">2</td></tr><tr class="exp e-i" hidden><td colspan="5"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-ia"><b>IA.1</b>Identity and Privilege Abuse</span></div><div class="reach"><span class="rlbl">and chains into 3 threats</span><em class="t s-rp"><b>RP.1</b>Prompt Injection</em><em class="t s-ta"><b>TA.1</b>Tool Misuse</em><em class="t s-ia"><b>IA.1</b>Identity and Privilege Abuse</em></div></td></tr>
-      <tr class="rw"><td class="id i">I3</td><td>Misinformation</td><td class="src">LLM09</td><td>Integrity</td><td class="cnt">8</td></tr><tr class="exp e-i" hidden><td colspan="5"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-rp"><b>RP.2</b>Agent Goal Hijack</span><span class="s-rp"><b>RP.3</b>Goal misgeneralisation</span><span class="s-rp"><b>RP.4</b>Behavioural drift</span><span class="s-km"><b>KM.1</b>Memory and Context Poisoning</span><span class="s-km"><b>KM.2</b>Data and Model Poisoning</span><span class="s-xa"><b>XA.2</b>Rogue Agents</span><span class="s-hi"><b>HI.1</b>Human-Agent Trust Exploitation</span></div><div class="reach"><span class="rlbl">and chains into 1 threat</span><em class="t s-hi"><b>HI.1</b>Human-Agent Trust Exploitation</em></div></td></tr>
-      <tr class="rw"><td class="id i">I4</td><td>Unexpected code execution</td><td class="src">ASI05 · MCP05</td><td>Integrity <em>of the execution environment</em></td><td class="cnt">11</td></tr><tr class="exp e-i" hidden><td colspan="5"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-rp"><b>RP.2</b>Agent Goal Hijack</span><span class="s-ta"><b>TA.1</b>Tool Misuse and Exploitation</span><span class="s-ta"><b>TA.2</b>Tool Poisoning</span><span class="s-ia"><b>IA.1</b>Identity and Privilege Abuse</span><span class="s-ia"><b>IA.2</b>Privilege Escalation via Scope Creep</span><span class="s-sc"><b>SC.1</b>Malicious extension</span><span class="s-sc"><b>SC.2</b>Dependency tampering</span><span class="s-sc"><b>SC.3</b>Metadata &amp; provenance forgery</span><span class="s-sc"><b>SC.4</b>Update Drift</span><span class="s-rt"><b>RT.3</b>Shadow deployment</span></div><div class="reach"><span class="rlbl">and chains into 5 threats</span><em class="t s-km"><b>KM.1</b>Memory and Context Poisoning</em><em class="t s-ia"><b>IA.1</b>Identity and Privilege Abuse</em><em class="t s-ia"><b>IA.2</b>Privilege Escalation</em><em class="t s-xa"><b>XA.2</b>Rogue Agents</em><em class="t s-rt"><b>RT.1</b>Resource exhaustion</em></div></td></tr>
-      <tr class="rw"><td class="id i">I5</td><td>Cascading Failures</td><td class="src">ASI08</td><td>Integrity · Availability</td><td class="cnt">9</td></tr><tr class="exp e-i" hidden><td colspan="5"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-rp"><b>RP.2</b>Agent Goal Hijack</span><span class="s-rp"><b>RP.3</b>Goal misgeneralisation</span><span class="s-rp"><b>RP.4</b>Behavioural drift</span><span class="s-km"><b>KM.1</b>Memory and Context Poisoning</span><span class="s-ta"><b>TA.1</b>Tool Misuse and Exploitation</span><span class="s-ia"><b>IA.2</b>Privilege Escalation via Scope Creep</span><span class="s-xa"><b>XA.1</b>Insecure Inter-Agent Communication</span><span class="s-xa"><b>XA.2</b>Rogue Agents</span></div><div class="reach"><span class="rlbl">and chains into 2 threats</span><em class="t s-rp"><b>RP.1</b>Prompt Injection</em><em class="t s-rt"><b>RT.1</b>Resource exhaustion</em></div></td></tr>
-      <tr class="rw"><td class="id i">I6</td><td>Availability &amp; cost loss</td><td class="src">LLM10 <em>split</em></td><td>Availability</td><td class="cnt">2</td></tr><tr class="exp e-i" hidden><td colspan="5"><div class="lst"><span class="s-rt"><b>RT.1</b>Resource exhaustion</span><span class="s-rt"><b>RT.2</b>Model extraction</span></div><div class="reach"><span class="rlbl">chains into nothing — the only pure sink</span><em>Degraded service and consumed budget supply no precondition another threat needs.</em></div></td></tr>
+      <tr class="rw"><td class="id i">I1</td><td>Sensitive data disclosure</td><td class="src">LLM02 · MCP01</td><td><span class="prop con">Confidentiality</span></td><td class="cnt">17</td><td class="cnt">2</td></tr><tr class="exp e-i" hidden><td colspan="6"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-rp"><b>RP.2</b>Agent Goal Hijack</span><span class="s-km"><b>KM.1</b>Memory and Context Poisoning</span><span class="s-km"><b>KM.2</b>Data and Model Poisoning</span><span class="s-ta"><b>TA.1</b>Tool Misuse and Exploitation</span><span class="s-ta"><b>TA.2</b>Tool Poisoning</span><span class="s-ia"><b>IA.1</b>Identity and Privilege Abuse</span><span class="s-ia"><b>IA.2</b>Privilege Escalation via Scope Creep</span><span class="s-xa"><b>XA.1</b>Insecure Inter-Agent Communication</span><span class="s-xa"><b>XA.2</b>Rogue Agents</span><span class="s-sc"><b>SC.1</b>Malicious extension</span><span class="s-sc"><b>SC.2</b>Dependency tampering</span><span class="s-sc"><b>SC.3</b>Metadata &amp; provenance forgery</span><span class="s-sc"><b>SC.4</b>Update Drift</span><span class="s-rt"><b>RT.2</b>Model extraction</span><span class="s-rt"><b>RT.3</b>Shadow deployment</span><span class="s-hi"><b>HI.1</b>Human-Agent Trust Exploitation</span></div><div class="reach"><span class="rlbl">and chains into 2 threats</span><em class="t s-ta"><b>TA.1</b>Tool Misuse</em><em class="t s-ia"><b>IA.1</b>Identity and Privilege Abuse</em></div></td></tr>
+      <tr class="rw"><td class="id i">I2</td><td>Hidden Context Exposure</td><td class="src">LLM07</td><td><span class="prop con">Confidentiality</span></td><td class="cnt">2</td><td class="cnt">3</td></tr><tr class="exp e-i" hidden><td colspan="6"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-ia"><b>IA.1</b>Identity and Privilege Abuse</span></div><div class="reach"><span class="rlbl">and chains into 3 threats</span><em class="t s-rp"><b>RP.1</b>Prompt Injection</em><em class="t s-ta"><b>TA.1</b>Tool Misuse</em><em class="t s-ia"><b>IA.1</b>Identity and Privilege Abuse</em></div></td></tr>
+      <tr class="rw"><td class="id i">I3</td><td>Misinformation</td><td class="src">LLM09</td><td><span class="prop int">Integrity</span></td><td class="cnt">8</td><td class="cnt">1</td></tr><tr class="exp e-i" hidden><td colspan="6"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-rp"><b>RP.2</b>Agent Goal Hijack</span><span class="s-rp"><b>RP.3</b>Goal misgeneralisation</span><span class="s-rp"><b>RP.4</b>Behavioural drift</span><span class="s-km"><b>KM.1</b>Memory and Context Poisoning</span><span class="s-km"><b>KM.2</b>Data and Model Poisoning</span><span class="s-xa"><b>XA.2</b>Rogue Agents</span><span class="s-hi"><b>HI.1</b>Human-Agent Trust Exploitation</span></div><div class="reach"><span class="rlbl">and chains into 1 threat</span><em class="t s-hi"><b>HI.1</b>Human-Agent Trust Exploitation</em></div></td></tr>
+      <tr class="rw"><td class="id i">I4</td><td>Unexpected code execution</td><td class="src">ASI05 · MCP05</td><td><span class="prop int">Integrity</span> <em>of the execution environment</em></td><td class="cnt">11</td><td class="cnt">5</td></tr><tr class="exp e-i" hidden><td colspan="6"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-rp"><b>RP.2</b>Agent Goal Hijack</span><span class="s-ta"><b>TA.1</b>Tool Misuse and Exploitation</span><span class="s-ta"><b>TA.2</b>Tool Poisoning</span><span class="s-ia"><b>IA.1</b>Identity and Privilege Abuse</span><span class="s-ia"><b>IA.2</b>Privilege Escalation via Scope Creep</span><span class="s-sc"><b>SC.1</b>Malicious extension</span><span class="s-sc"><b>SC.2</b>Dependency tampering</span><span class="s-sc"><b>SC.3</b>Metadata &amp; provenance forgery</span><span class="s-sc"><b>SC.4</b>Update Drift</span><span class="s-rt"><b>RT.3</b>Shadow deployment</span></div><div class="reach"><span class="rlbl">and chains into 5 threats</span><em class="t s-km"><b>KM.1</b>Memory and Context Poisoning</em><em class="t s-ia"><b>IA.1</b>Identity and Privilege Abuse</em><em class="t s-ia"><b>IA.2</b>Privilege Escalation</em><em class="t s-xa"><b>XA.2</b>Rogue Agents</em><em class="t s-rt"><b>RT.1</b>Resource exhaustion</em></div></td></tr>
+      <tr class="rw"><td class="id i">I5</td><td>Cascading Failures</td><td class="src">ASI08</td><td><span class="prop int">Integrity</span> · <span class="prop avl">Availability</span></td><td class="cnt">9</td><td class="cnt">2</td></tr><tr class="exp e-i" hidden><td colspan="6"><div class="lst"><span class="s-rp"><b>RP.1</b>Prompt Injection</span><span class="s-rp"><b>RP.2</b>Agent Goal Hijack</span><span class="s-rp"><b>RP.3</b>Goal misgeneralisation</span><span class="s-rp"><b>RP.4</b>Behavioural drift</span><span class="s-km"><b>KM.1</b>Memory and Context Poisoning</span><span class="s-ta"><b>TA.1</b>Tool Misuse and Exploitation</span><span class="s-ia"><b>IA.2</b>Privilege Escalation via Scope Creep</span><span class="s-xa"><b>XA.1</b>Insecure Inter-Agent Communication</span><span class="s-xa"><b>XA.2</b>Rogue Agents</span></div><div class="reach"><span class="rlbl">and chains into 2 threats</span><em class="t s-rp"><b>RP.1</b>Prompt Injection</em><em class="t s-rt"><b>RT.1</b>Resource exhaustion</em></div></td></tr>
+      <tr class="rw"><td class="id i">I6</td><td>Availability &amp; cost loss</td><td class="src">LLM10 <em>split</em></td><td><span class="prop avl">Availability</span></td><td class="cnt">2</td><td class="cnt">0</td></tr><tr class="exp e-i" hidden><td colspan="6"><div class="lst"><span class="s-rt"><b>RT.1</b>Resource exhaustion</span><span class="s-rt"><b>RT.2</b>Model extraction</span></div><div class="reach"><span class="rlbl">chains into nothing — the only pure sink</span><em>Degraded service and consumed budget supply no precondition another threat needs.</em></div></td></tr>
     </tbody>
   </table></div>
 
@@ -1308,45 +1232,12 @@ I5     cascading failures           downstream agents compound the error</pre>
   <div class="scroll"><table>
     <thead><tr><th>Property</th><th class="num">Threats reaching it</th></tr></thead>
     <tbody>
-      <tr><td>Integrity — <code>I3</code> <code>I4</code> <code>I5</code></td><td class="num"><strong>18 of 20</strong></td></tr>
-      <tr><td>Confidentiality — <code>I1</code> <code>I2</code></td><td class="num">16 of 20</td></tr>
-      <tr><td>Availability — <code>I5</code> <code>I6</code></td><td class="num">11 of 20</td></tr>
+      <tr><td><span class="prop int">Integrity</span> — <code>I3</code> <code>I4</code> <code>I5</code></td><td class="num"><strong>18 of 20</strong></td></tr>
+      <tr><td><span class="prop con">Confidentiality</span> — <code>I1</code> <code>I2</code></td><td class="num">17 of 20</td></tr>
+      <tr><td><span class="prop avl">Availability</span> — <code>I5</code> <code>I6</code></td><td class="num">11 of 20</td></tr>
     </tbody>
   </table></div>
-  <p style="margin-top:15px">Agentic risk is discussed as a confidentiality problem — exfiltration,
-    the lethal trifecta, data leaving the boundary. By this model it is marginally more an
-    <strong>integrity</strong> problem: the agent doing the wrong thing, believing the wrong thing,
-    or executing the wrong code. <code>I5</code> counts in two rows, which flatters both integrity
-    and availability; even discounting it, the two are level.</p>
-  <p><code>I1</code> is reached by 16 of 20 threats, which means it discriminates almost nothing.
-    That is a true property of agentic systems rather than a modelling defect — data disclosure is
-    the near-universal terminal state — but it has a consequence: <strong>severity does not live in
-    this layer.</strong> What varies is the data the assessed system actually holds.</p>
-
-  <h3>Chain reach — impacts by threats they enable</h3>
-  <p>The counterpart to control leverage in the weakness register. An <code>I → T</code> edge exists where the impact <strong>supplies a precondition the threat requires</strong> — the outcome creates, at runtime, a condition the threat needed and did not have. It is not "bad things follow", and it is not a restatement of <code>W → T</code>: a weakness is a standing property of the system, an impact is a state the system was driven into.</p>
-  <div class="scroll"><table>
-    <thead><tr><th class="num">#</th><th>Impact</th><th>Chains into</th></tr></thead>
-    <tbody>
-      <tr><td class="num"><strong>5</strong></td><td><span class="id i">I4</span> Unexpected code execution</td><td class="lnk"><span class="s-km"><b>KM.1</b></span><span class="s-ia"><b>IA.1</b></span><span class="s-ia"><b>IA.2</b></span><span class="s-xa"><b>XA.2</b></span><span class="s-rt"><b>RT.1</b></span></td></tr>
-      <tr><td class="num">3</td><td><span class="id i">I2</span> Hidden Context Exposure</td><td class="lnk"><span class="s-rp"><b>RP.1</b></span><span class="s-ta"><b>TA.1</b></span><span class="s-ia"><b>IA.1</b></span></td></tr>
-      <tr><td class="num">2</td><td><span class="id i">I1</span> Sensitive data disclosure</td><td class="lnk"><span class="s-ta"><b>TA.1</b></span><span class="s-ia"><b>IA.1</b></span></td></tr>
-      <tr><td class="num">2</td><td><span class="id i">I5</span> Cascading Failures</td><td class="lnk"><span class="s-rp"><b>RP.1</b></span><span class="s-rt"><b>RT.1</b></span></td></tr>
-      <tr><td class="num">1</td><td><span class="id i">I3</span> Misinformation</td><td class="lnk"><span class="s-hi"><b>HI.1</b></span></td></tr>
-      <tr><td class="num">0</td><td><span class="id i">I6</span> Availability &amp; cost loss</td><td class="lnk"><em>nothing</em></td></tr>
-    </tbody>
-  </table></div>
-  <p style="margin-top:15px"><strong>13 edges.</strong> <code>I4</code> is the most generative
-    impact in the model and <code>I6</code> the only <strong>pure sink</strong> — degraded service
-    and consumed budget supply no precondition another threat needs. <code>I2 → RP.1</code> is why
-    prompt extraction matters: once the guardrail wording is known, injection can be written to
-    evade the guardrails it just read.</p>
-  <p>Twelve of the twenty threats have no inbound edge at all — <code>RP.2</code>,
-    <code>RP.3</code>, <code>RP.4</code>, <code>KM.2</code>, <code>TA.2</code>, <code>XA.1</code>,
-    all four of <code>SC</code>, <code>RT.2</code> and <code>RT.3</code>. A chain cannot arrive at
-    them; they are only ever the <em>start</em> of one. Expand any row above to see both directions
-    for one impact at once — which threats reach it, and which it chains onward into.</p>
-</section>
+              </section>
 
 <!-- map folded into the W and I registers -->
 
@@ -1354,13 +1245,13 @@ I5     cascading failures           downstream agents compound the error</pre>
 <section id="graph">
   <h2><span class="n">GRAPH</span>Every relation in one view</h2>
   <p class="lede">The three registers hold the same graph one row at a time. This is all of it at
-    once — 38 nodes and 124 directed edges, every one generated from the
+    once — 38 nodes and 125 directed edges, every one generated from the
     registers above rather than drawn by hand. <strong>Select any node</strong> to isolate what it
     touches, or switch a relation off to read the layers separately.</p>
 
   <div class="gbar" id="gbar" role="group" aria-label="Filter the graph by relation">
     <div class="fg g-wt"><span class="fl">W → T</span><button type="button" class="fb" data-rel="wt" aria-pressed="true">enables <i>51</i></button></div>
-    <div class="fg g-ti"><span class="fl">T → I</span><button type="button" class="fb" data-rel="ti" aria-pressed="true">produces <i>48</i></button></div>
+    <div class="fg g-ti"><span class="fl">T → I</span><button type="button" class="fb" data-rel="ti" aria-pressed="true">produces <i>49</i></button></div>
     <div class="fg g-it"><span class="fl">I → T</span><button type="button" class="fb" data-rel="it" aria-pressed="true">chains into <i>13</i></button></div>
     <div class="fg g-tt"><span class="fl">T → T</span><button type="button" class="fb" data-rel="tt" aria-pressed="true">escalates <i>12</i></button></div>
     <span class="gs" id="gstat" aria-live="polite">select a node</span>
@@ -1368,335 +1259,337 @@ I5     cascading failures           downstream agents compound the error</pre>
 
   <figure>
     <div class="scroll">
-<svg viewBox="0 0 1010 675" id="gsvg" role="img" aria-label="The complete taxonomy graph. Twelve weaknesses on the left, twenty threats in the centre grouped by surface, six impacts on the right. Fifty-one arrows run from weaknesses to the threats they enable, forty-eight from threats to the impacts they produce, thirteen curve back from impacts to the threats they enable in turn, and twelve run between threats, all touching prompt injection. Select a node to isolate its edges, or use the relation filter to show one relation at a time.">
+<svg viewBox="0 0 1048 675" id="gsvg" role="img" aria-label="The complete taxonomy graph. Twelve weaknesses on the left, twenty threats in the centre grouped by surface, six impacts on the right. Fifty-one arrows run from weaknesses to the threats they enable, forty-eight from threats to the impacts they produce, thirteen curve back from impacts to the threats they enable in turn, and twelve run between threats, all touching prompt injection. Select a node to isolate its edges, or use the relation filter to show one relation at a time.">
 <defs>
   <marker id="mw" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="var(--w)"/></marker>
   <marker id="mi" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="var(--i)"/></marker>
   <marker id="mb" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="var(--f-origin)"/></marker>
   <marker id="mt" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="var(--t)"/></marker>
+  <marker id="mv" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="var(--w)"/></marker>
 </defs>
 <text x="20" y="28" class="gh">WEAKNESS · 12</text>
-<text x="360" y="28" class="gh">THREAT · 20</text>
-<text x="800" y="28" class="gh">IMPACT · 6</text>
+<text x="430" y="28" class="gh">THREAT · 20</text>
+<text x="836" y="28" class="gh">IMPACT · 6</text>
 <text x="20" y="44" class="gsub">a standing condition</text>
-<text x="360" y="44" class="gsub">an event</text>
-<text x="800" y="44" class="gsub">an outcome</text>
+<text x="430" y="44" class="gsub">an event</text>
+<text x="836" y="44" class="gsub">an outcome</text>
 <g id="gedges">
-<path class="ge e-wt" data-a="W1" data-b="RP.1" marker-end="url(#mw)" d="M140,58 C250,58 250,58 353,58"/>
-<path class="ge e-wt" data-a="W2" data-b="RT.1" marker-end="url(#mw)" d="M140,571 C250,571 250,490 353,490"/>
-<path class="ge e-wt" data-a="W2" data-b="RT.2" marker-end="url(#mw)" d="M140,571 C250,571 250,517 353,517"/>
-<path class="ge e-wt" data-a="W3" data-b="KM.1" marker-end="url(#mw)" d="M140,291.18181818181813 C250,291.18181818181813 250,166 353,166"/>
-<path class="ge e-wt" data-a="W3" data-b="TA.1" marker-end="url(#mw)" d="M140,291.18181818181813 C250,291.18181818181813 250,220 353,220"/>
-<path class="ge e-wt" data-a="W3" data-b="TA.2" marker-end="url(#mw)" d="M140,291.18181818181813 C250,291.18181818181813 250,247 353,247"/>
-<path class="ge e-wt" data-a="W3" data-b="IA.1" marker-end="url(#mw)" d="M140,291.18181818181813 C250,291.18181818181813 250,274 353,274"/>
-<path class="ge e-wt" data-a="W3" data-b="IA.2" marker-end="url(#mw)" d="M140,291.18181818181813 C250,291.18181818181813 250,301 353,301"/>
-<path class="ge e-wt" data-a="W3" data-b="XA.1" marker-end="url(#mw)" d="M140,291.18181818181813 C250,291.18181818181813 250,328 353,328"/>
-<path class="ge e-wt" data-a="W3" data-b="RT.1" marker-end="url(#mw)" d="M140,291.18181818181813 C250,291.18181818181813 250,490 353,490"/>
-<path class="ge e-wt" data-a="W4" data-b="RP.3" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,112 353,112"/>
-<path class="ge e-wt" data-a="W4" data-b="RP.4" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,139 353,139"/>
-<path class="ge e-wt" data-a="W4" data-b="KM.1" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,166 353,166"/>
-<path class="ge e-wt" data-a="W4" data-b="IA.1" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,274 353,274"/>
-<path class="ge e-wt" data-a="W4" data-b="XA.1" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,328 353,328"/>
-<path class="ge e-wt" data-a="W4" data-b="XA.2" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,355 353,355"/>
-<path class="ge e-wt" data-a="W4" data-b="RT.2" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,517 353,517"/>
-<path class="ge e-wt" data-a="W4" data-b="RT.3" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,544 353,544"/>
-<path class="ge e-wt" data-a="W4" data-b="HI.1" marker-end="url(#mw)" d="M140,431.09090909090907 C250,431.09090909090907 250,571 353,571"/>
-<path class="ge e-wt" data-a="W5" data-b="TA.1" marker-end="url(#mw)" d="M140,384.45454545454544 C250,384.45454545454544 250,220 353,220"/>
-<path class="ge e-wt" data-a="W5" data-b="SC.1" marker-end="url(#mw)" d="M140,384.45454545454544 C250,384.45454545454544 250,382 353,382"/>
-<path class="ge e-wt" data-a="W6" data-b="KM.2" marker-end="url(#mw)" d="M140,524.3636363636363 C250,524.3636363636363 250,193 353,193"/>
-<path class="ge e-wt" data-a="W6" data-b="TA.2" marker-end="url(#mw)" d="M140,524.3636363636363 C250,524.3636363636363 250,247 353,247"/>
-<path class="ge e-wt" data-a="W6" data-b="SC.1" marker-end="url(#mw)" d="M140,524.3636363636363 C250,524.3636363636363 250,382 353,382"/>
-<path class="ge e-wt" data-a="W6" data-b="SC.2" marker-end="url(#mw)" d="M140,524.3636363636363 C250,524.3636363636363 250,409 353,409"/>
-<path class="ge e-wt" data-a="W6" data-b="SC.3" marker-end="url(#mw)" d="M140,524.3636363636363 C250,524.3636363636363 250,436 353,436"/>
-<path class="ge e-wt" data-a="W6" data-b="SC.4" marker-end="url(#mw)" d="M140,524.3636363636363 C250,524.3636363636363 250,463 353,463"/>
-<path class="ge e-wt" data-a="W7" data-b="RP.4" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,139 353,139"/>
-<path class="ge e-wt" data-a="W7" data-b="KM.2" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,193 353,193"/>
-<path class="ge e-wt" data-a="W7" data-b="TA.2" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,247 353,247"/>
-<path class="ge e-wt" data-a="W7" data-b="XA.2" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,355 353,355"/>
-<path class="ge e-wt" data-a="W7" data-b="SC.1" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,382 353,382"/>
-<path class="ge e-wt" data-a="W7" data-b="SC.2" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,409 353,409"/>
-<path class="ge e-wt" data-a="W7" data-b="SC.3" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,436 353,436"/>
-<path class="ge e-wt" data-a="W7" data-b="SC.4" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,463 353,463"/>
-<path class="ge e-wt" data-a="W7" data-b="RT.3" marker-end="url(#mw)" d="M140,477.7272727272727 C250,477.7272727272727 250,544 353,544"/>
-<path class="ge e-wt" data-a="W8" data-b="RP.2" marker-end="url(#mw)" d="M140,244.54545454545453 C250,244.54545454545453 250,85 353,85"/>
-<path class="ge e-wt" data-a="W8" data-b="RP.3" marker-end="url(#mw)" d="M140,244.54545454545453 C250,244.54545454545453 250,112 353,112"/>
-<path class="ge e-wt" data-a="W8" data-b="TA.1" marker-end="url(#mw)" d="M140,244.54545454545453 C250,244.54545454545453 250,220 353,220"/>
-<path class="ge e-wt" data-a="W8" data-b="XA.2" marker-end="url(#mw)" d="M140,244.54545454545453 C250,244.54545454545453 250,355 353,355"/>
-<path class="ge e-wt" data-a="W8" data-b="HI.1" marker-end="url(#mw)" d="M140,244.54545454545453 C250,244.54545454545453 250,571 353,571"/>
-<path class="ge e-wt" data-a="W9" data-b="RP.1" marker-end="url(#mw)" d="M140,104.63636363636363 C250,104.63636363636363 250,58 353,58"/>
-<path class="ge e-wt" data-a="W9" data-b="RP.2" marker-end="url(#mw)" d="M140,104.63636363636363 C250,104.63636363636363 250,85 353,85"/>
-<path class="ge e-wt" data-a="W9" data-b="KM.1" marker-end="url(#mw)" d="M140,104.63636363636363 C250,104.63636363636363 250,166 353,166"/>
-<path class="ge e-wt" data-a="W10" data-b="TA.1" marker-end="url(#mw)" d="M140,337.8181818181818 C250,337.8181818181818 250,220 353,220"/>
-<path class="ge e-wt" data-a="W10" data-b="IA.1" marker-end="url(#mw)" d="M140,337.8181818181818 C250,337.8181818181818 250,274 353,274"/>
-<path class="ge e-wt" data-a="W10" data-b="IA.2" marker-end="url(#mw)" d="M140,337.8181818181818 C250,337.8181818181818 250,301 353,301"/>
-<path class="ge e-wt" data-a="W10" data-b="SC.1" marker-end="url(#mw)" d="M140,337.8181818181818 C250,337.8181818181818 250,382 353,382"/>
-<path class="ge e-wt" data-a="W11" data-b="KM.1" marker-end="url(#mw)" d="M140,151.27272727272725 C250,151.27272727272725 250,166 353,166"/>
-<path class="ge e-wt" data-a="W12" data-b="RP.1" marker-end="url(#mw)" d="M140,197.9090909090909 C250,197.9090909090909 250,58 353,58"/>
-<path class="ge e-wt" data-a="W12" data-b="IA.1" marker-end="url(#mw)" d="M140,197.9090909090909 C250,197.9090909090909 250,274 353,274"/>
-<path class="ge e-ti" data-a="RP.1" data-b="I1" marker-end="url(#mi)" d="M620,58 C710,58 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="RP.1" data-b="I2" marker-end="url(#mi)" d="M620,58 C710,58 710,58 793,58"/>
-<path class="ge e-ti" data-a="RP.1" data-b="I3" marker-end="url(#mi)" d="M620,58 C710,58 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="RP.1" data-b="I4" marker-end="url(#mi)" d="M620,58 C710,58 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="RP.1" data-b="I5" marker-end="url(#mi)" d="M620,58 C710,58 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="KM.1" data-b="I1" marker-end="url(#mi)" d="M620,166 C710,166 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="KM.1" data-b="I3" marker-end="url(#mi)" d="M620,166 C710,166 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="KM.1" data-b="I5" marker-end="url(#mi)" d="M620,166 C710,166 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="KM.2" data-b="I1" marker-end="url(#mi)" d="M620,193 C710,193 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="KM.2" data-b="I3" marker-end="url(#mi)" d="M620,193 C710,193 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="TA.1" data-b="I1" marker-end="url(#mi)" d="M620,220 C710,220 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="TA.1" data-b="I4" marker-end="url(#mi)" d="M620,220 C710,220 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="TA.1" data-b="I5" marker-end="url(#mi)" d="M620,220 C710,220 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="TA.2" data-b="I1" marker-end="url(#mi)" d="M620,247 C710,247 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="TA.2" data-b="I4" marker-end="url(#mi)" d="M620,247 C710,247 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="IA.1" data-b="I1" marker-end="url(#mi)" d="M620,274 C710,274 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="IA.1" data-b="I2" marker-end="url(#mi)" d="M620,274 C710,274 710,58 793,58"/>
-<path class="ge e-ti" data-a="IA.1" data-b="I4" marker-end="url(#mi)" d="M620,274 C710,274 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="IA.2" data-b="I1" marker-end="url(#mi)" d="M620,301 C710,301 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="IA.2" data-b="I4" marker-end="url(#mi)" d="M620,301 C710,301 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="IA.2" data-b="I5" marker-end="url(#mi)" d="M620,301 C710,301 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="XA.1" data-b="I1" marker-end="url(#mi)" d="M620,328 C710,328 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="XA.1" data-b="I5" marker-end="url(#mi)" d="M620,328 C710,328 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="XA.2" data-b="I1" marker-end="url(#mi)" d="M620,355 C710,355 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="XA.2" data-b="I3" marker-end="url(#mi)" d="M620,355 C710,355 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="XA.2" data-b="I5" marker-end="url(#mi)" d="M620,355 C710,355 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="SC.1" data-b="I1" marker-end="url(#mi)" d="M620,382 C710,382 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="SC.1" data-b="I4" marker-end="url(#mi)" d="M620,382 C710,382 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="SC.2" data-b="I1" marker-end="url(#mi)" d="M620,409 C710,409 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="SC.2" data-b="I4" marker-end="url(#mi)" d="M620,409 C710,409 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="SC.3" data-b="I1" marker-end="url(#mi)" d="M620,436 C710,436 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="SC.3" data-b="I4" marker-end="url(#mi)" d="M620,436 C710,436 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="SC.4" data-b="I1" marker-end="url(#mi)" d="M620,463 C710,463 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="SC.4" data-b="I4" marker-end="url(#mi)" d="M620,463 C710,463 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="RT.2" data-b="I1" marker-end="url(#mi)" d="M620,517 C710,517 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="RT.2" data-b="I6" marker-end="url(#mi)" d="M620,517 C710,517 710,571 793,571"/>
-<path class="ge e-ti" data-a="RT.3" data-b="I1" marker-end="url(#mi)" d="M620,544 C710,544 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="RT.3" data-b="I4" marker-end="url(#mi)" d="M620,544 C710,544 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="HI.1" data-b="I1" marker-end="url(#mi)" d="M620,571 C710,571 710,468.4 793,468.4"/>
-<path class="ge e-ti" data-a="HI.1" data-b="I3" marker-end="url(#mi)" d="M620,571 C710,571 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="RP.2" data-b="I3" marker-end="url(#mi)" d="M620,85 C710,85 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="RP.2" data-b="I4" marker-end="url(#mi)" d="M620,85 C710,85 710,365.79999999999995 793,365.79999999999995"/>
-<path class="ge e-ti" data-a="RP.2" data-b="I5" marker-end="url(#mi)" d="M620,85 C710,85 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="RP.3" data-b="I3" marker-end="url(#mi)" d="M620,112 C710,112 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="RP.3" data-b="I5" marker-end="url(#mi)" d="M620,112 C710,112 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="RP.4" data-b="I3" marker-end="url(#mi)" d="M620,139 C710,139 710,160.6 793,160.6"/>
-<path class="ge e-ti" data-a="RP.4" data-b="I5" marker-end="url(#mi)" d="M620,139 C710,139 710,263.2 793,263.2"/>
-<path class="ge e-ti" data-a="RT.1" data-b="I6" marker-end="url(#mi)" d="M620,490 C710,490 710,571 793,571"/>
-<path class="ge e-it" data-a="I1" data-b="TA.1" marker-end="url(#mb)" d="M804,474.4 C860,629 660,629 627,226"/>
-<path class="ge e-it" data-a="I1" data-b="IA.1" marker-end="url(#mb)" d="M804,474.4 C860,629 660,629 627,280"/>
-<path class="ge e-it" data-a="I2" data-b="RP.1" marker-end="url(#mb)" d="M804,64 C860,629 660,629 627,64"/>
-<path class="ge e-it" data-a="I2" data-b="TA.1" marker-end="url(#mb)" d="M804,64 C860,629 660,629 627,226"/>
-<path class="ge e-it" data-a="I2" data-b="IA.1" marker-end="url(#mb)" d="M804,64 C860,629 660,629 627,280"/>
-<path class="ge e-it" data-a="I3" data-b="HI.1" marker-end="url(#mb)" d="M804,166.6 C860,629 660,629 627,577"/>
-<path class="ge e-it" data-a="I4" data-b="KM.1" marker-end="url(#mb)" d="M804,371.79999999999995 C860,629 660,629 627,172"/>
-<path class="ge e-it" data-a="I4" data-b="IA.1" marker-end="url(#mb)" d="M804,371.79999999999995 C860,629 660,629 627,280"/>
-<path class="ge e-it" data-a="I4" data-b="IA.2" marker-end="url(#mb)" d="M804,371.79999999999995 C860,629 660,629 627,307"/>
-<path class="ge e-it" data-a="I4" data-b="XA.2" marker-end="url(#mb)" d="M804,371.79999999999995 C860,629 660,629 627,361"/>
-<path class="ge e-it" data-a="I4" data-b="RT.1" marker-end="url(#mb)" d="M804,371.79999999999995 C860,629 660,629 627,496"/>
-<path class="ge e-it" data-a="I5" data-b="RP.1" marker-end="url(#mb)" d="M804,269.2 C860,629 660,629 627,64"/>
-<path class="ge e-it" data-a="I5" data-b="RT.1" marker-end="url(#mb)" d="M804,269.2 C860,629 660,629 627,496"/>
-<path class="ge e-tt" data-a="KM.1" data-b="RP.1" marker-end="url(#mt)" d="M622,166 C667.5,166 667.5,58 628,58"/>
-<path class="ge e-tt" data-a="TA.2" data-b="RP.1" marker-end="url(#mt)" d="M622,247 C677.625,247 677.625,58 628,58"/>
-<path class="ge e-tt" data-a="XA.1" data-b="RP.1" marker-end="url(#mt)" d="M622,328 C680,328 680,58 628,58"/>
-<path class="ge e-tt" data-a="SC.1" data-b="RP.1" marker-end="url(#mt)" d="M622,382 C680,382 680,58 628,58"/>
-<path class="ge e-tt" data-a="RP.1" data-b="RP.2" marker-end="url(#mt)" d="M622,58 C657.375,58 657.375,85 628,85"/>
-<path class="ge e-tt" data-a="RP.1" data-b="KM.1" marker-end="url(#mt)" d="M622,58 C667.5,58 667.5,166 628,166"/>
-<path class="ge e-tt" data-a="RP.1" data-b="TA.1" marker-end="url(#mt)" d="M622,58 C674.25,58 674.25,220 628,220"/>
-<path class="ge e-tt cnd" data-a="RP.1" data-b="IA.1" marker-end="url(#mt)" d="M622,58 C680,58 680,274 628,274"/>
-<path class="ge e-tt cnd" data-a="RP.1" data-b="IA.2" marker-end="url(#mt)" d="M622,58 C680,58 680,301 628,301"/>
-<path class="ge e-tt" data-a="RP.1" data-b="XA.2" marker-end="url(#mt)" d="M622,58 C680,58 680,355 628,355"/>
-<path class="ge e-tt" data-a="RP.1" data-b="RT.1" marker-end="url(#mt)" d="M622,58 C680,58 680,490 628,490"/>
-<path class="ge e-tt" data-a="RP.1" data-b="HI.1" marker-end="url(#mt)" d="M622,58 C680,58 680,571 628,571"/>
+<path class="ge e-wt" data-a="W1" data-b="RP.1" marker-end="url(#mw)" d="M286,58 C358,58 358,58 423,58"/>
+<path class="ge e-wt" data-a="W2" data-b="RT.1" marker-end="url(#mw)" d="M286,104.63636363636363 C358,104.63636363636363 358,490 423,490"/>
+<path class="ge e-wt" data-a="W2" data-b="RT.2" marker-end="url(#mw)" d="M286,104.63636363636363 C358,104.63636363636363 358,517 423,517"/>
+<path class="ge e-wt" data-a="W3" data-b="KM.1" marker-end="url(#mw)" d="M286,151.27272727272725 C358,151.27272727272725 358,166 423,166"/>
+<path class="ge e-wt" data-a="W3" data-b="TA.1" marker-end="url(#mw)" d="M286,151.27272727272725 C358,151.27272727272725 358,220 423,220"/>
+<path class="ge e-wt" data-a="W3" data-b="TA.2" marker-end="url(#mw)" d="M286,151.27272727272725 C358,151.27272727272725 358,247 423,247"/>
+<path class="ge e-wt" data-a="W3" data-b="IA.1" marker-end="url(#mw)" d="M286,151.27272727272725 C358,151.27272727272725 358,274 423,274"/>
+<path class="ge e-wt" data-a="W3" data-b="IA.2" marker-end="url(#mw)" d="M286,151.27272727272725 C358,151.27272727272725 358,301 423,301"/>
+<path class="ge e-wt" data-a="W3" data-b="XA.1" marker-end="url(#mw)" d="M286,151.27272727272725 C358,151.27272727272725 358,328 423,328"/>
+<path class="ge e-wt" data-a="W3" data-b="RT.1" marker-end="url(#mw)" d="M286,151.27272727272725 C358,151.27272727272725 358,490 423,490"/>
+<path class="ge e-wt" data-a="W4" data-b="RP.3" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,112 423,112"/>
+<path class="ge e-wt" data-a="W4" data-b="RP.4" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,139 423,139"/>
+<path class="ge e-wt" data-a="W4" data-b="KM.1" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,166 423,166"/>
+<path class="ge e-wt" data-a="W4" data-b="IA.1" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,274 423,274"/>
+<path class="ge e-wt" data-a="W4" data-b="XA.1" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,328 423,328"/>
+<path class="ge e-wt" data-a="W4" data-b="XA.2" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,355 423,355"/>
+<path class="ge e-wt" data-a="W4" data-b="RT.2" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,517 423,517"/>
+<path class="ge e-wt" data-a="W4" data-b="RT.3" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,544 423,544"/>
+<path class="ge e-wt" data-a="W4" data-b="HI.1" marker-end="url(#mw)" d="M286,197.9090909090909 C358,197.9090909090909 358,571 423,571"/>
+<path class="ge e-wt" data-a="W5" data-b="TA.1" marker-end="url(#mw)" d="M286,244.54545454545453 C358,244.54545454545453 358,220 423,220"/>
+<path class="ge e-wt" data-a="W5" data-b="SC.1" marker-end="url(#mw)" d="M286,244.54545454545453 C358,244.54545454545453 358,382 423,382"/>
+<path class="ge e-wt" data-a="W6" data-b="KM.2" marker-end="url(#mw)" d="M286,291.18181818181813 C358,291.18181818181813 358,193 423,193"/>
+<path class="ge e-wt" data-a="W6" data-b="TA.2" marker-end="url(#mw)" d="M286,291.18181818181813 C358,291.18181818181813 358,247 423,247"/>
+<path class="ge e-wt" data-a="W6" data-b="SC.1" marker-end="url(#mw)" d="M286,291.18181818181813 C358,291.18181818181813 358,382 423,382"/>
+<path class="ge e-wt" data-a="W6" data-b="SC.2" marker-end="url(#mw)" d="M286,291.18181818181813 C358,291.18181818181813 358,409 423,409"/>
+<path class="ge e-wt" data-a="W6" data-b="SC.3" marker-end="url(#mw)" d="M286,291.18181818181813 C358,291.18181818181813 358,436 423,436"/>
+<path class="ge e-wt" data-a="W6" data-b="SC.4" marker-end="url(#mw)" d="M286,291.18181818181813 C358,291.18181818181813 358,463 423,463"/>
+<path class="ge e-wt" data-a="W7" data-b="RP.4" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,139 423,139"/>
+<path class="ge e-wt" data-a="W7" data-b="KM.2" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,193 423,193"/>
+<path class="ge e-wt" data-a="W7" data-b="TA.2" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,247 423,247"/>
+<path class="ge e-wt" data-a="W7" data-b="XA.2" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,355 423,355"/>
+<path class="ge e-wt" data-a="W7" data-b="SC.1" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,382 423,382"/>
+<path class="ge e-wt" data-a="W7" data-b="SC.2" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,409 423,409"/>
+<path class="ge e-wt" data-a="W7" data-b="SC.3" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,436 423,436"/>
+<path class="ge e-wt" data-a="W7" data-b="SC.4" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,463 423,463"/>
+<path class="ge e-wt" data-a="W7" data-b="RT.3" marker-end="url(#mw)" d="M286,337.8181818181818 C358,337.8181818181818 358,544 423,544"/>
+<path class="ge e-wt" data-a="W8" data-b="RP.2" marker-end="url(#mw)" d="M286,384.45454545454544 C358,384.45454545454544 358,85 423,85"/>
+<path class="ge e-wt" data-a="W8" data-b="RP.3" marker-end="url(#mw)" d="M286,384.45454545454544 C358,384.45454545454544 358,112 423,112"/>
+<path class="ge e-wt" data-a="W8" data-b="TA.1" marker-end="url(#mw)" d="M286,384.45454545454544 C358,384.45454545454544 358,220 423,220"/>
+<path class="ge e-wt" data-a="W8" data-b="XA.2" marker-end="url(#mw)" d="M286,384.45454545454544 C358,384.45454545454544 358,355 423,355"/>
+<path class="ge e-wt" data-a="W8" data-b="HI.1" marker-end="url(#mw)" d="M286,384.45454545454544 C358,384.45454545454544 358,571 423,571"/>
+<path class="ge e-wt" data-a="W9" data-b="RP.1" marker-end="url(#mw)" d="M286,431.09090909090907 C358,431.09090909090907 358,58 423,58"/>
+<path class="ge e-wt" data-a="W9" data-b="RP.2" marker-end="url(#mw)" d="M286,431.09090909090907 C358,431.09090909090907 358,85 423,85"/>
+<path class="ge e-wt" data-a="W9" data-b="KM.1" marker-end="url(#mw)" d="M286,431.09090909090907 C358,431.09090909090907 358,166 423,166"/>
+<path class="ge e-wt" data-a="W10" data-b="TA.1" marker-end="url(#mw)" d="M286,477.7272727272727 C358,477.7272727272727 358,220 423,220"/>
+<path class="ge e-wt" data-a="W10" data-b="IA.1" marker-end="url(#mw)" d="M286,477.7272727272727 C358,477.7272727272727 358,274 423,274"/>
+<path class="ge e-wt" data-a="W10" data-b="IA.2" marker-end="url(#mw)" d="M286,477.7272727272727 C358,477.7272727272727 358,301 423,301"/>
+<path class="ge e-wt" data-a="W10" data-b="SC.1" marker-end="url(#mw)" d="M286,477.7272727272727 C358,477.7272727272727 358,382 423,382"/>
+<path class="ge e-wt" data-a="W11" data-b="KM.1" marker-end="url(#mw)" d="M286,524.3636363636363 C358,524.3636363636363 358,166 423,166"/>
+<path class="ge e-wt" data-a="W12" data-b="RP.1" marker-end="url(#mw)" d="M286,571 C358,571 358,58 423,58"/>
+<path class="ge e-wt" data-a="W12" data-b="IA.1" marker-end="url(#mw)" d="M286,571 C358,571 358,274 423,274"/>
+<path class="ge e-ti" data-a="RP.1" data-b="I1" marker-end="url(#mi)" d="M672,58 C754,58 754,58 829,58"/>
+<path class="ge e-ti" data-a="RP.1" data-b="I2" marker-end="url(#mi)" d="M672,58 C754,58 754,160.6 829,160.6"/>
+<path class="ge e-ti" data-a="RP.1" data-b="I3" marker-end="url(#mi)" d="M672,58 C754,58 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="RP.1" data-b="I4" marker-end="url(#mi)" d="M672,58 C754,58 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="RP.1" data-b="I5" marker-end="url(#mi)" d="M672,58 C754,58 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="RP.2" data-b="I1" marker-end="url(#mi)" d="M672,85 C754,85 754,58 829,58"/>
+<path class="ge e-ti" data-a="RP.2" data-b="I3" marker-end="url(#mi)" d="M672,85 C754,85 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="RP.2" data-b="I4" marker-end="url(#mi)" d="M672,85 C754,85 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="RP.2" data-b="I5" marker-end="url(#mi)" d="M672,85 C754,85 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="KM.1" data-b="I1" marker-end="url(#mi)" d="M672,166 C754,166 754,58 829,58"/>
+<path class="ge e-ti" data-a="KM.1" data-b="I3" marker-end="url(#mi)" d="M672,166 C754,166 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="KM.1" data-b="I5" marker-end="url(#mi)" d="M672,166 C754,166 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="KM.2" data-b="I1" marker-end="url(#mi)" d="M672,193 C754,193 754,58 829,58"/>
+<path class="ge e-ti" data-a="KM.2" data-b="I3" marker-end="url(#mi)" d="M672,193 C754,193 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="TA.1" data-b="I1" marker-end="url(#mi)" d="M672,220 C754,220 754,58 829,58"/>
+<path class="ge e-ti" data-a="TA.1" data-b="I4" marker-end="url(#mi)" d="M672,220 C754,220 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="TA.1" data-b="I5" marker-end="url(#mi)" d="M672,220 C754,220 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="TA.2" data-b="I1" marker-end="url(#mi)" d="M672,247 C754,247 754,58 829,58"/>
+<path class="ge e-ti" data-a="TA.2" data-b="I4" marker-end="url(#mi)" d="M672,247 C754,247 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="IA.1" data-b="I1" marker-end="url(#mi)" d="M672,274 C754,274 754,58 829,58"/>
+<path class="ge e-ti" data-a="IA.1" data-b="I2" marker-end="url(#mi)" d="M672,274 C754,274 754,160.6 829,160.6"/>
+<path class="ge e-ti" data-a="IA.1" data-b="I4" marker-end="url(#mi)" d="M672,274 C754,274 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="IA.2" data-b="I1" marker-end="url(#mi)" d="M672,301 C754,301 754,58 829,58"/>
+<path class="ge e-ti" data-a="IA.2" data-b="I4" marker-end="url(#mi)" d="M672,301 C754,301 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="IA.2" data-b="I5" marker-end="url(#mi)" d="M672,301 C754,301 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="XA.1" data-b="I1" marker-end="url(#mi)" d="M672,328 C754,328 754,58 829,58"/>
+<path class="ge e-ti" data-a="XA.1" data-b="I5" marker-end="url(#mi)" d="M672,328 C754,328 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="XA.2" data-b="I1" marker-end="url(#mi)" d="M672,355 C754,355 754,58 829,58"/>
+<path class="ge e-ti" data-a="XA.2" data-b="I3" marker-end="url(#mi)" d="M672,355 C754,355 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="XA.2" data-b="I5" marker-end="url(#mi)" d="M672,355 C754,355 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="SC.1" data-b="I1" marker-end="url(#mi)" d="M672,382 C754,382 754,58 829,58"/>
+<path class="ge e-ti" data-a="SC.1" data-b="I4" marker-end="url(#mi)" d="M672,382 C754,382 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="SC.2" data-b="I1" marker-end="url(#mi)" d="M672,409 C754,409 754,58 829,58"/>
+<path class="ge e-ti" data-a="SC.2" data-b="I4" marker-end="url(#mi)" d="M672,409 C754,409 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="SC.3" data-b="I1" marker-end="url(#mi)" d="M672,436 C754,436 754,58 829,58"/>
+<path class="ge e-ti" data-a="SC.3" data-b="I4" marker-end="url(#mi)" d="M672,436 C754,436 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="SC.4" data-b="I1" marker-end="url(#mi)" d="M672,463 C754,463 754,58 829,58"/>
+<path class="ge e-ti" data-a="SC.4" data-b="I4" marker-end="url(#mi)" d="M672,463 C754,463 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="RT.2" data-b="I1" marker-end="url(#mi)" d="M672,517 C754,517 754,58 829,58"/>
+<path class="ge e-ti" data-a="RT.2" data-b="I6" marker-end="url(#mi)" d="M672,517 C754,517 754,571 829,571"/>
+<path class="ge e-ti" data-a="RT.3" data-b="I1" marker-end="url(#mi)" d="M672,544 C754,544 754,58 829,58"/>
+<path class="ge e-ti" data-a="RT.3" data-b="I4" marker-end="url(#mi)" d="M672,544 C754,544 754,365.79999999999995 829,365.79999999999995"/>
+<path class="ge e-ti" data-a="HI.1" data-b="I1" marker-end="url(#mi)" d="M672,571 C754,571 754,58 829,58"/>
+<path class="ge e-ti" data-a="HI.1" data-b="I3" marker-end="url(#mi)" d="M672,571 C754,571 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="RP.3" data-b="I3" marker-end="url(#mi)" d="M672,112 C754,112 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="RP.3" data-b="I5" marker-end="url(#mi)" d="M672,112 C754,112 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="RP.4" data-b="I3" marker-end="url(#mi)" d="M672,139 C754,139 754,263.2 829,263.2"/>
+<path class="ge e-ti" data-a="RP.4" data-b="I5" marker-end="url(#mi)" d="M672,139 C754,139 754,468.4 829,468.4"/>
+<path class="ge e-ti" data-a="RT.1" data-b="I6" marker-end="url(#mi)" d="M672,490 C754,490 754,571 829,571"/>
+<path class="ge e-it" data-a="I1" data-b="TA.1" marker-end="url(#mb)" d="M840,64 C896,629 712,629 679,226"/>
+<path class="ge e-it" data-a="I1" data-b="IA.1" marker-end="url(#mb)" d="M840,64 C896,629 712,629 679,280"/>
+<path class="ge e-it" data-a="I2" data-b="RP.1" marker-end="url(#mb)" d="M840,166.6 C896,629 712,629 679,64"/>
+<path class="ge e-it" data-a="I2" data-b="TA.1" marker-end="url(#mb)" d="M840,166.6 C896,629 712,629 679,226"/>
+<path class="ge e-it" data-a="I2" data-b="IA.1" marker-end="url(#mb)" d="M840,166.6 C896,629 712,629 679,280"/>
+<path class="ge e-it" data-a="I3" data-b="HI.1" marker-end="url(#mb)" d="M840,269.2 C896,629 712,629 679,577"/>
+<path class="ge e-it" data-a="I4" data-b="KM.1" marker-end="url(#mb)" d="M840,371.79999999999995 C896,629 712,629 679,172"/>
+<path class="ge e-it" data-a="I4" data-b="IA.1" marker-end="url(#mb)" d="M840,371.79999999999995 C896,629 712,629 679,280"/>
+<path class="ge e-it" data-a="I4" data-b="IA.2" marker-end="url(#mb)" d="M840,371.79999999999995 C896,629 712,629 679,307"/>
+<path class="ge e-it" data-a="I4" data-b="XA.2" marker-end="url(#mb)" d="M840,371.79999999999995 C896,629 712,629 679,361"/>
+<path class="ge e-it" data-a="I4" data-b="RT.1" marker-end="url(#mb)" d="M840,371.79999999999995 C896,629 712,629 679,496"/>
+<path class="ge e-it" data-a="I5" data-b="RP.1" marker-end="url(#mb)" d="M840,474.4 C896,629 712,629 679,64"/>
+<path class="ge e-it" data-a="I5" data-b="RT.1" marker-end="url(#mb)" d="M840,474.4 C896,629 712,629 679,496"/>
+<path class="ge e-tt via" data-a="KM.1" data-b="RP.1" marker-end="url(#mv)" d="M674,166 C719.5,166 719.5,58 680,58"/>
+<path class="ge e-tt via" data-a="TA.2" data-b="RP.1" marker-end="url(#mv)" d="M674,247 C729.625,247 729.625,58 680,58"/>
+<path class="ge e-tt via" data-a="XA.1" data-b="RP.1" marker-end="url(#mv)" d="M674,328 C732,328 732,58 680,58"/>
+<path class="ge e-tt via" data-a="SC.1" data-b="RP.1" marker-end="url(#mv)" d="M674,382 C732,382 732,58 680,58"/>
+<path class="ge e-tt" data-a="RP.1" data-b="RP.2" marker-end="url(#mt)" d="M674,58 C709.375,58 709.375,85 680,85"/>
+<path class="ge e-tt" data-a="RP.1" data-b="KM.1" marker-end="url(#mt)" d="M674,58 C719.5,58 719.5,166 680,166"/>
+<path class="ge e-tt" data-a="RP.1" data-b="TA.1" marker-end="url(#mt)" d="M674,58 C726.25,58 726.25,220 680,220"/>
+<path class="ge e-tt cnd" data-a="RP.1" data-b="IA.1" marker-end="url(#mt)" d="M674,58 C732,58 732,274 680,274"/>
+<path class="ge e-tt cnd" data-a="RP.1" data-b="IA.2" marker-end="url(#mt)" d="M674,58 C732,58 732,301 680,301"/>
+<path class="ge e-tt" data-a="RP.1" data-b="XA.2" marker-end="url(#mt)" d="M674,58 C732,58 732,355 680,355"/>
+<path class="ge e-tt" data-a="RP.1" data-b="RT.1" marker-end="url(#mt)" d="M674,58 C732,58 732,490 680,490"/>
+<path class="ge e-tt" data-a="RP.1" data-b="HI.1" marker-end="url(#mt)" d="M674,58 C732,58 732,571 680,571"/>
 </g>
 <g id="gnodes">
 <g class="gn" data-id="W1" tabindex="0" role="button" aria-label="W1 Improper Output Handling">
-    <rect x="20" y="48" width="120" height="20" rx="2" class="nb nw"/>
+    <rect x="20" y="48" width="266" height="20" rx="2" class="nb nw"/>
     <text x="27" y="62" class="nid nwid">W1</text>
-    <text x="57" y="62" class="nnm">Improper Output Ha…</text>
-  </g>
-<g class="gn" data-id="W9" tabindex="0" role="button" aria-label="W9 No data / control plane separation">
-    <rect x="20" y="94.63636363636363" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="108.63636363636363" class="nid nwid">W9</text>
-    <text x="57" y="108.63636363636363" class="nnm">No data / control …</text>
-  </g>
-<g class="gn" data-id="W11" tabindex="0" role="button" aria-label="W11 Vector and Embedding Weakness">
-    <rect x="20" y="141.27272727272725" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="155.27272727272725" class="nid nwid">W11</text>
-    <text x="57" y="155.27272727272725" class="nnm">Vector and Embeddi…</text>
-  </g>
-<g class="gn" data-id="W12" tabindex="0" role="button" aria-label="W12 Insufficient context scoping">
-    <rect x="20" y="187.9090909090909" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="201.9090909090909" class="nid nwid">W12</text>
-    <text x="57" y="201.9090909090909" class="nnm">Insufficient conte…</text>
-  </g>
-<g class="gn" data-id="W8" tabindex="0" role="button" aria-label="W8 Excessive Agency">
-    <rect x="20" y="234.54545454545453" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="248.54545454545453" class="nid nwid">W8</text>
-    <text x="57" y="248.54545454545453" class="nnm">Excessive Agency</text>
-  </g>
-<g class="gn" data-id="W3" tabindex="0" role="button" aria-label="W3 Insufficient Authentication &amp; Authorisation">
-    <rect x="20" y="281.18181818181813" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="295.18181818181813" class="nid nwid">W3</text>
-    <text x="57" y="295.18181818181813" class="nnm">Insufficient Authe…</text>
-  </g>
-<g class="gn" data-id="W10" tabindex="0" role="button" aria-label="W10 Over-privileged component">
-    <rect x="20" y="327.8181818181818" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="341.8181818181818" class="nid nwid">W10</text>
-    <text x="57" y="341.8181818181818" class="nnm">Over-privileged co…</text>
-  </g>
-<g class="gn" data-id="W5" tabindex="0" role="button" aria-label="W5 Weak Isolation">
-    <rect x="20" y="374.45454545454544" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="388.45454545454544" class="nid nwid">W5</text>
-    <text x="57" y="388.45454545454544" class="nnm">Weak Isolation</text>
-  </g>
-<g class="gn" data-id="W4" tabindex="0" role="button" aria-label="W4 Lack of Audit and Telemetry">
-    <rect x="20" y="421.09090909090907" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="435.09090909090907" class="nid nwid">W4</text>
-    <text x="57" y="435.09090909090907" class="nnm">Lack of Audit and …</text>
-  </g>
-<g class="gn" data-id="W7" tabindex="0" role="button" aria-label="W7 No Governance">
-    <rect x="20" y="467.7272727272727" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="481.7272727272727" class="nid nwid">W7</text>
-    <text x="57" y="481.7272727272727" class="nnm">No Governance</text>
-  </g>
-<g class="gn" data-id="W6" tabindex="0" role="button" aria-label="W6 Poor Scanning">
-    <rect x="20" y="514.3636363636363" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="528.3636363636363" class="nid nwid">W6</text>
-    <text x="57" y="528.3636363636363" class="nnm">Poor Scanning</text>
+    <text x="63" y="62" class="nnm">Improper Output Handling</text>
   </g>
 <g class="gn" data-id="W2" tabindex="0" role="button" aria-label="W2 No resource bounds">
-    <rect x="20" y="561" width="120" height="20" rx="2" class="nb nw"/>
-    <text x="27" y="575" class="nid nwid">W2</text>
-    <text x="57" y="575" class="nnm">No resource bounds</text>
+    <rect x="20" y="94.63636363636363" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="108.63636363636363" class="nid nwid">W2</text>
+    <text x="63" y="108.63636363636363" class="nnm">No resource bounds</text>
+  </g>
+<g class="gn" data-id="W3" tabindex="0" role="button" aria-label="W3 Insufficient Authentication &amp; Authorisation">
+    <rect x="20" y="141.27272727272725" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="155.27272727272725" class="nid nwid">W3</text>
+    <text x="63" y="155.27272727272725" class="nnm">Insufficient Authentication &amp; Authorisation</text>
+  </g>
+<g class="gn" data-id="W4" tabindex="0" role="button" aria-label="W4 Lack of Audit and Telemetry">
+    <rect x="20" y="187.9090909090909" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="201.9090909090909" class="nid nwid">W4</text>
+    <text x="63" y="201.9090909090909" class="nnm">Lack of Audit and Telemetry</text>
+  </g>
+<g class="gn" data-id="W5" tabindex="0" role="button" aria-label="W5 Weak Isolation">
+    <rect x="20" y="234.54545454545453" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="248.54545454545453" class="nid nwid">W5</text>
+    <text x="63" y="248.54545454545453" class="nnm">Weak Isolation</text>
+  </g>
+<g class="gn" data-id="W6" tabindex="0" role="button" aria-label="W6 Poor Scanning">
+    <rect x="20" y="281.18181818181813" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="295.18181818181813" class="nid nwid">W6</text>
+    <text x="63" y="295.18181818181813" class="nnm">Poor Scanning</text>
+  </g>
+<g class="gn" data-id="W7" tabindex="0" role="button" aria-label="W7 No Governance">
+    <rect x="20" y="327.8181818181818" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="341.8181818181818" class="nid nwid">W7</text>
+    <text x="63" y="341.8181818181818" class="nnm">No Governance</text>
+  </g>
+<g class="gn" data-id="W8" tabindex="0" role="button" aria-label="W8 Excessive Agency">
+    <rect x="20" y="374.45454545454544" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="388.45454545454544" class="nid nwid">W8</text>
+    <text x="63" y="388.45454545454544" class="nnm">Excessive Agency</text>
+  </g>
+<g class="gn" data-id="W9" tabindex="0" role="button" aria-label="W9 No data / control plane separation">
+    <rect x="20" y="421.09090909090907" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="435.09090909090907" class="nid nwid">W9</text>
+    <text x="63" y="435.09090909090907" class="nnm">No data / control plane separation</text>
+  </g>
+<g class="gn" data-id="W10" tabindex="0" role="button" aria-label="W10 Over-privileged component">
+    <rect x="20" y="467.7272727272727" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="481.7272727272727" class="nid nwid">W10</text>
+    <text x="63" y="481.7272727272727" class="nnm">Over-privileged component</text>
+  </g>
+<g class="gn" data-id="W11" tabindex="0" role="button" aria-label="W11 Vector and Embedding Weakness">
+    <rect x="20" y="514.3636363636363" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="528.3636363636363" class="nid nwid">W11</text>
+    <text x="63" y="528.3636363636363" class="nnm">Vector and Embedding Weakness</text>
+  </g>
+<g class="gn" data-id="W12" tabindex="0" role="button" aria-label="W12 Insufficient context scoping">
+    <rect x="20" y="561" width="266" height="20" rx="2" class="nb nw"/>
+    <text x="27" y="575" class="nid nwid">W12</text>
+    <text x="63" y="575" class="nnm">Insufficient context scoping</text>
   </g>
 <g class="gn s-rp" data-id="RP.1" tabindex="0" role="button" aria-label="RP.1 Prompt Injection">
-    <rect x="360" y="48" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="62" class="nid ntid">RP.1</text>
-    <text x="407" y="62" class="nnm">Prompt Injection</text>
+    <rect x="430" y="48" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="62" class="nid ntid">RP.1</text>
+    <text x="477" y="62" class="nnm">Prompt Injection</text>
   </g>
 <g class="gn s-rp" data-id="RP.2" tabindex="0" role="button" aria-label="RP.2 Agent Goal Hijack">
-    <rect x="360" y="75" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="89" class="nid ntid">RP.2</text>
-    <text x="407" y="89" class="nnm">Agent Goal Hijack</text>
+    <rect x="430" y="75" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="89" class="nid ntid">RP.2</text>
+    <text x="477" y="89" class="nnm">Agent Goal Hijack</text>
   </g>
 <g class="gn s-rp" data-id="RP.3" tabindex="0" role="button" aria-label="RP.3 Goal misgeneralisation">
-    <rect x="360" y="102" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="116" class="nid ntid">RP.3</text>
-    <text x="407" y="116" class="nnm">Goal misgeneralisation</text>
+    <rect x="430" y="102" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="116" class="nid ntid">RP.3</text>
+    <text x="477" y="116" class="nnm">Goal misgeneralisation</text>
   </g>
 <g class="gn s-rp" data-id="RP.4" tabindex="0" role="button" aria-label="RP.4 Behavioural drift">
-    <rect x="360" y="129" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="143" class="nid ntid">RP.4</text>
-    <text x="407" y="143" class="nnm">Behavioural drift</text>
+    <rect x="430" y="129" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="143" class="nid ntid">RP.4</text>
+    <text x="477" y="143" class="nnm">Behavioural drift</text>
   </g>
 <g class="gn s-km" data-id="KM.1" tabindex="0" role="button" aria-label="KM.1 Memory and Context Poisoning">
-    <rect x="360" y="156" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="170" class="nid ntid">KM.1</text>
-    <text x="407" y="170" class="nnm">Memory and Context Poisoning</text>
+    <rect x="430" y="156" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="170" class="nid ntid">KM.1</text>
+    <text x="477" y="170" class="nnm">Memory and Context Poisoning</text>
   </g>
 <g class="gn s-km" data-id="KM.2" tabindex="0" role="button" aria-label="KM.2 Data and Model Poisoning">
-    <rect x="360" y="183" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="197" class="nid ntid">KM.2</text>
-    <text x="407" y="197" class="nnm">Data and Model Poisoning</text>
+    <rect x="430" y="183" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="197" class="nid ntid">KM.2</text>
+    <text x="477" y="197" class="nnm">Data and Model Poisoning</text>
   </g>
 <g class="gn s-ta" data-id="TA.1" tabindex="0" role="button" aria-label="TA.1 Tool Misuse and Exploitation">
-    <rect x="360" y="210" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="224" class="nid ntid">TA.1</text>
-    <text x="407" y="224" class="nnm">Tool Misuse and Exploitation</text>
+    <rect x="430" y="210" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="224" class="nid ntid">TA.1</text>
+    <text x="477" y="224" class="nnm">Tool Misuse and Exploitation</text>
   </g>
 <g class="gn s-ta" data-id="TA.2" tabindex="0" role="button" aria-label="TA.2 Tool Poisoning">
-    <rect x="360" y="237" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="251" class="nid ntid">TA.2</text>
-    <text x="407" y="251" class="nnm">Tool Poisoning</text>
+    <rect x="430" y="237" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="251" class="nid ntid">TA.2</text>
+    <text x="477" y="251" class="nnm">Tool Poisoning</text>
   </g>
 <g class="gn s-ia" data-id="IA.1" tabindex="0" role="button" aria-label="IA.1 Identity and Privilege Abuse">
-    <rect x="360" y="264" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="278" class="nid ntid">IA.1</text>
-    <text x="407" y="278" class="nnm">Identity and Privilege Abuse</text>
+    <rect x="430" y="264" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="278" class="nid ntid">IA.1</text>
+    <text x="477" y="278" class="nnm">Identity and Privilege Abuse</text>
   </g>
 <g class="gn s-ia" data-id="IA.2" tabindex="0" role="button" aria-label="IA.2 Privilege Escalation via Scope Creep">
-    <rect x="360" y="291" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="305" class="nid ntid">IA.2</text>
-    <text x="407" y="305" class="nnm">Privilege Escalation via Scope…</text>
+    <rect x="430" y="291" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="305" class="nid ntid">IA.2</text>
+    <text x="477" y="305" class="nnm">Privilege Escalation via Scope Creep</text>
   </g>
 <g class="gn s-xa" data-id="XA.1" tabindex="0" role="button" aria-label="XA.1 Insecure Inter-Agent Communication">
-    <rect x="360" y="318" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="332" class="nid ntid">XA.1</text>
-    <text x="407" y="332" class="nnm">Insecure Inter-Agent Communica…</text>
+    <rect x="430" y="318" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="332" class="nid ntid">XA.1</text>
+    <text x="477" y="332" class="nnm">Insecure Inter-Agent Communication</text>
   </g>
 <g class="gn s-xa" data-id="XA.2" tabindex="0" role="button" aria-label="XA.2 Rogue Agents">
-    <rect x="360" y="345" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="359" class="nid ntid">XA.2</text>
-    <text x="407" y="359" class="nnm">Rogue Agents</text>
+    <rect x="430" y="345" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="359" class="nid ntid">XA.2</text>
+    <text x="477" y="359" class="nnm">Rogue Agents</text>
   </g>
 <g class="gn s-sc" data-id="SC.1" tabindex="0" role="button" aria-label="SC.1 Malicious extension">
-    <rect x="360" y="372" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="386" class="nid ntid">SC.1</text>
-    <text x="407" y="386" class="nnm">Malicious extension</text>
+    <rect x="430" y="372" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="386" class="nid ntid">SC.1</text>
+    <text x="477" y="386" class="nnm">Malicious extension</text>
   </g>
 <g class="gn s-sc" data-id="SC.2" tabindex="0" role="button" aria-label="SC.2 Dependency tampering">
-    <rect x="360" y="399" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="413" class="nid ntid">SC.2</text>
-    <text x="407" y="413" class="nnm">Dependency tampering</text>
+    <rect x="430" y="399" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="413" class="nid ntid">SC.2</text>
+    <text x="477" y="413" class="nnm">Dependency tampering</text>
   </g>
 <g class="gn s-sc" data-id="SC.3" tabindex="0" role="button" aria-label="SC.3 Metadata &amp; provenance forgery">
-    <rect x="360" y="426" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="440" class="nid ntid">SC.3</text>
-    <text x="407" y="440" class="nnm">Metadata &amp; provenance forgery</text>
+    <rect x="430" y="426" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="440" class="nid ntid">SC.3</text>
+    <text x="477" y="440" class="nnm">Metadata &amp; provenance forgery</text>
   </g>
 <g class="gn s-sc" data-id="SC.4" tabindex="0" role="button" aria-label="SC.4 Update Drift">
-    <rect x="360" y="453" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="467" class="nid ntid">SC.4</text>
-    <text x="407" y="467" class="nnm">Update Drift</text>
+    <rect x="430" y="453" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="467" class="nid ntid">SC.4</text>
+    <text x="477" y="467" class="nnm">Update Drift</text>
   </g>
 <g class="gn s-rt" data-id="RT.1" tabindex="0" role="button" aria-label="RT.1 Resource exhaustion">
-    <rect x="360" y="480" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="494" class="nid ntid">RT.1</text>
-    <text x="407" y="494" class="nnm">Resource exhaustion</text>
+    <rect x="430" y="480" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="494" class="nid ntid">RT.1</text>
+    <text x="477" y="494" class="nnm">Resource exhaustion</text>
   </g>
 <g class="gn s-rt" data-id="RT.2" tabindex="0" role="button" aria-label="RT.2 Model extraction">
-    <rect x="360" y="507" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="521" class="nid ntid">RT.2</text>
-    <text x="407" y="521" class="nnm">Model extraction</text>
+    <rect x="430" y="507" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="521" class="nid ntid">RT.2</text>
+    <text x="477" y="521" class="nnm">Model extraction</text>
   </g>
 <g class="gn s-rt" data-id="RT.3" tabindex="0" role="button" aria-label="RT.3 Shadow deployment">
-    <rect x="360" y="534" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="548" class="nid ntid">RT.3</text>
-    <text x="407" y="548" class="nnm">Shadow deployment</text>
+    <rect x="430" y="534" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="548" class="nid ntid">RT.3</text>
+    <text x="477" y="548" class="nnm">Shadow deployment</text>
   </g>
 <g class="gn s-hi" data-id="HI.1" tabindex="0" role="button" aria-label="HI.1 Human-Agent Trust Exploitation">
-    <rect x="360" y="561" width="260" height="20" rx="2" class="nb nt"/>
-    <text x="367" y="575" class="nid ntid">HI.1</text>
-    <text x="407" y="575" class="nnm">Human-Agent Trust Exploitation</text>
-  </g>
-<g class="gn" data-id="I2" tabindex="0" role="button" aria-label="I2 Hidden Context Exposure">
-    <rect x="800" y="48" width="190" height="20" rx="2" class="nb ni"/>
-    <text x="807" y="62" class="nid niid">I2</text>
-    <text x="837" y="62" class="nnm">Hidden Context Exposure</text>
-  </g>
-<g class="gn" data-id="I3" tabindex="0" role="button" aria-label="I3 Misinformation">
-    <rect x="800" y="150.6" width="190" height="20" rx="2" class="nb ni"/>
-    <text x="807" y="164.6" class="nid niid">I3</text>
-    <text x="837" y="164.6" class="nnm">Misinformation</text>
-  </g>
-<g class="gn" data-id="I5" tabindex="0" role="button" aria-label="I5 Cascading Failures">
-    <rect x="800" y="253.2" width="190" height="20" rx="2" class="nb ni"/>
-    <text x="807" y="267.2" class="nid niid">I5</text>
-    <text x="837" y="267.2" class="nnm">Cascading Failures</text>
-  </g>
-<g class="gn" data-id="I4" tabindex="0" role="button" aria-label="I4 Unexpected code execution">
-    <rect x="800" y="355.79999999999995" width="190" height="20" rx="2" class="nb ni"/>
-    <text x="807" y="369.79999999999995" class="nid niid">I4</text>
-    <text x="837" y="369.79999999999995" class="nnm">Unexpected code executi…</text>
+    <rect x="430" y="561" width="242" height="20" rx="2" class="nb nt"/>
+    <text x="437" y="575" class="nid ntid">HI.1</text>
+    <text x="477" y="575" class="nnm">Human-Agent Trust Exploitation</text>
   </g>
 <g class="gn" data-id="I1" tabindex="0" role="button" aria-label="I1 Sensitive data disclosure">
-    <rect x="800" y="458.4" width="190" height="20" rx="2" class="nb ni"/>
-    <text x="807" y="472.4" class="nid niid">I1</text>
-    <text x="837" y="472.4" class="nnm">Sensitive data disclosu…</text>
+    <rect x="836" y="48" width="182" height="20" rx="2" class="nb ni"/>
+    <text x="843" y="62" class="nid niid">I1</text>
+    <text x="873" y="62" class="nnm">Sensitive data disclosure</text>
+  </g>
+<g class="gn" data-id="I2" tabindex="0" role="button" aria-label="I2 Hidden Context Exposure">
+    <rect x="836" y="150.6" width="182" height="20" rx="2" class="nb ni"/>
+    <text x="843" y="164.6" class="nid niid">I2</text>
+    <text x="873" y="164.6" class="nnm">Hidden Context Exposure</text>
+  </g>
+<g class="gn" data-id="I3" tabindex="0" role="button" aria-label="I3 Misinformation">
+    <rect x="836" y="253.2" width="182" height="20" rx="2" class="nb ni"/>
+    <text x="843" y="267.2" class="nid niid">I3</text>
+    <text x="873" y="267.2" class="nnm">Misinformation</text>
+  </g>
+<g class="gn" data-id="I4" tabindex="0" role="button" aria-label="I4 Unexpected code execution">
+    <rect x="836" y="355.79999999999995" width="182" height="20" rx="2" class="nb ni"/>
+    <text x="843" y="369.79999999999995" class="nid niid">I4</text>
+    <text x="873" y="369.79999999999995" class="nnm">Unexpected code execution</text>
+  </g>
+<g class="gn" data-id="I5" tabindex="0" role="button" aria-label="I5 Cascading Failures">
+    <rect x="836" y="458.4" width="182" height="20" rx="2" class="nb ni"/>
+    <text x="843" y="472.4" class="nid niid">I5</text>
+    <text x="873" y="472.4" class="nnm">Cascading Failures</text>
   </g>
 <g class="gn" data-id="I6" tabindex="0" role="button" aria-label="I6 Availability &amp; cost loss">
-    <rect x="800" y="561" width="190" height="20" rx="2" class="nb ni"/>
-    <text x="807" y="575" class="nid niid">I6</text>
-    <text x="837" y="575" class="nnm">Availability &amp; cost loss</text>
+    <rect x="836" y="561" width="182" height="20" rx="2" class="nb ni"/>
+    <text x="843" y="575" class="nid niid">I6</text>
+    <text x="873" y="575" class="nnm">Availability &amp; cost loss</text>
   </g>
 </g>
 </svg>
@@ -1704,12 +1597,16 @@ I5     cascading failures           downstream agents compound the error</pre>
     <figcaption><strong>Arrows run left to right for the two forward relations</strong> — teal
       <code>W → T</code>, rust <code>T → I</code>. The violet dashed arcs sweeping underneath are
       <code>I → T</code>, the feedback that makes multi-step attacks expressible; they are drawn
-      below the columns so they cannot be mistaken for the forward band. Blue arcs hugging the
-      threat column are <code>T → T</code>, every one touching <code>RP.1</code>, dashed where the
-      escalation is conditional on a capability. Weaknesses and impacts are ordered by the average
-      position of what they connect to, which is what keeps the crossings down; threats stay in
-      surface order. There is no <code>W → I</code> arrow because the model never stores one —
-      it composes, like <code>T → I → T</code>.</figcaption>
+      below the columns so they cannot be mistaken for the forward band. The arcs hugging the
+      threat column are <code>T → T</code>, every one touching <code>RP.1</code>: blue running
+      <em>out</em> of it, eight escalations, dashed where conditional on a capability; green
+      running <em>into</em> it, the four <code>via</code> threats that deliver injection rather
+      than escalate from it. All three columns run in register order —
+      <code>W1</code> to <code>W12</code>, the threats by surface, <code>I1</code> to
+      <code>I6</code> — so any entry is found by counting rather than hunting. That costs
+      crossings in the forward bands, which is what selecting a node is for. There is no
+      <code>W → I</code> arrow because the model never stores one — it composes, like
+      <code>T → I → T</code>.</figcaption>
   </figure>
 </section>
 
@@ -1740,7 +1637,6 @@ I5     cascading failures           downstream agents compound the error</pre>
 <!-- ============ WALKTHROUGH ============ -->
 <section id="walk">
   <h2><span class="n">WALKTHROUGH</span>How to use it</h2>
-  <p class="lede">The one part of this document that is genuinely a sequence.</p>
   <ol class="steps">
     <li><strong>Identify present positions.</strong> Walk the architecture against the reference
       diagram. Does the system retrieve external content (<code>KM</code>)? Invoke tools
@@ -1757,7 +1653,7 @@ I5     cascading failures           downstream agents compound the error</pre>
       weaknesses are present. A threat whose weaknesses are all mitigated is lower priority; a
       weakness enabling several threats is a high-leverage control target.</li>
     <li><strong>Trace impacts</strong> for regulatory-reporting scope. Severity does not come from
-      this layer — <code>I1</code> is produced by 16 of 20 threats. What varies is the data the
+      this layer — <code>I1</code> is produced by 17 of 20 threats. What varies is the data the
       assessed system actually holds: personal, regulated, credential, proprietary. Apply that here,
       at assessment time.</li>
     <li><strong>Follow chains.</strong> For each impact, ask whether it enables a further threat.
@@ -1774,32 +1670,11 @@ I5     cascading failures           downstream agents compound the error</pre>
       threats need behavioural bounds, not attacker deterrence.</li>
   </ol>
 
-  <h3>Control leverage — weaknesses by threats enabled</h3>
-  <div class="scroll"><table>
-    <thead><tr><th class="num">n</th><th>Weakness</th><th>Principle violated</th></tr></thead>
-    <tbody>
-            <tr><td class="num"><strong>9</strong></td><td><span class="id w">W4</span> Lack of Audit and Telemetry</td><td>Anomaly Detection</td></tr>
-            <tr><td class="num"><strong>9</strong></td><td><span class="id w">W7</span> No Governance</td><td>Govern</td></tr>
-            <tr><td class="num">7</td><td><span class="id w">W3</span> Insufficient Authentication &amp; Authorisation</td><td>Mediated Access</td></tr>
-            <tr><td class="num">6</td><td><span class="id w">W6</span> Poor Scanning</td><td>Substantiated Trustworthiness</td></tr>
-            <tr><td class="num">5</td><td><span class="id w">W8</span> Excessive Agency</td><td>Least-Agency</td></tr>
-            <tr><td class="num">4</td><td><span class="id w">W10</span> Over-privileged component</td><td>Least Privilege</td></tr>
-            <tr><td class="num">3</td><td><span class="id w">W9</span> No data / control plane separation</td><td>Domain Separation</td></tr>
-            <tr><td class="num">2</td><td><span class="id w">W2</span> No resource bounds</td><td>Loss Margins</td></tr>
-            <tr><td class="num">2</td><td><span class="id w">W5</span> Weak Isolation</td><td>Least Common Mechanism</td></tr>
-            <tr><td class="num">2</td><td><span class="id w">W12</span> Insufficient context scoping</td><td>Least Sharing</td></tr>
-            <tr><td class="num">1</td><td><span class="id w">W1</span> Improper Output Handling</td><td>Continuous Protection</td></tr>
-            <tr><td class="num">1</td><td><span class="id w">W11</span> Vector and Embedding Weakness</td><td>Provenance</td></tr>
-          </tbody>
-  </table></div>
-  <p style="margin-top:15px">The top four are governance and observability weaknesses rather than
-    technical controls — consistent with the State report's finding that agentic risk is primarily
-    an architectural and governance problem.</p>
-</section>
+      </section>
 
 <footer>
   <span>20 threats · 12 weaknesses · 6 impacts</span>
-  <span>51 W→T edges · 48 T→I edges</span>
+  <span>51 W→T edges · 49 T→I edges</span>
   <span>40 source entries mapped, none orphaned</span>
 </footer>
 
